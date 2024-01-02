@@ -15,7 +15,7 @@ A small userscript that improves your fishtank experience
 - no popup when toggling auto
 - fix for stream freezing
 - keybind for auto (. button aka period)
-- persistent volume,
+- persistent volume
 - no popup for season pass
 - better "last tts" (gets updated then hides itself)
 - tts flashes room on map
@@ -24,3 +24,5 @@ A small userscript that improves your fishtank experience
 Settings can be found here:
 
 ![brave_2024-01-01_22-15-23](https://github.com/codironblade/BetterFishtankS2/assets/133949229/51351b67-e8c3-4f6f-a18c-b6da93c75a11)
+
+Another ftl script to check out [maejok tools][https://github.com/maejok-xx/maejok-tools] idk whatever you prefer
