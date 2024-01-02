@@ -1,4 +1,4 @@
-A small userscript that improves your fishtank experience
+A small userscript that improves your fishtank experience. Target site: https://fishtank.live
 
 [Download](https://github.com/codironblade/BetterFishtankS2/raw/main/ftl.user.js)
 
