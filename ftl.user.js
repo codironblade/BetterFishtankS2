@@ -126,7 +126,7 @@ let h1 = null;
 const smoother = function() {
     const dur = h1.style.animationDuration;
     h1.style.animationTimingFunction = "steps(" + (Number(dur.substring(0,dur.length-1))*60) +",start)";
-    h1.parentElement.style.height = "34px";
+    h1.parentElement.style.height = "30px";
 }
 document.arrive(".led-text_led__xdruo > h1",{onceOnly:true},function(h){
     h1 = h;
