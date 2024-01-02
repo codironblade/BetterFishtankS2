@@ -25,4 +25,5 @@ Settings can be found here:
 
 ![brave_2024-01-01_22-15-23](https://github.com/codironblade/BetterFishtankS2/assets/133949229/51351b67-e8c3-4f6f-a18c-b6da93c75a11)
 
-Another ftl script to check out [maejok tools](https://github.com/maejok-xx/maejok-tools) idk whatever you prefer
+Shout another ftl script: [maejok tools](https://github.com/maejok-xx/maejok-tools)
+I'm not affiliated with them and don't check compatibility
