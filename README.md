@@ -1,6 +1,6 @@
 A small userscript that improves your fishtank experience. Target site: https://fishtank.live
 
-[Download](https://github.com/codironblade/BetterFishtankS2/raw/main/ftl.user.js)
+[Download](https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js)
 
 (Requires tampermonkey / violentmonkey / greasemonkey)
 
