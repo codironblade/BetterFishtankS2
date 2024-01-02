@@ -7,8 +7,8 @@
 // @version     0.5
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
-// @updateURL    https://github.com/codironblade/BetterFishtankS2/raw/master/ftl.user.js
-// @downloadURL  https://github.com/codironblade/BetterFishtankS2/raw/master/ftl.user.js
+// @updateURL    https://github.com/codironblade/BetterFishtankS2/raw/main/ftl.user.js
+// @downloadURL  https://github.com/codironblade/BetterFishtankS2/raw/main/ftl.user.js
 // @description Improvements to the fishtank.live website.
 // @icon        https://www.google.com/s2/favicons?sz=64&domain=fishtank.live
 // @require     https://raw.githubusercontent.com/uzairfarooq/arrive/master/minified/arrive.min.js
