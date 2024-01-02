@@ -38,8 +38,8 @@ const save = function(){
 }
 const playerEdits = [[".live-stream-fullscreen_left__idsvZ",{flex:"2% 1"}],[".live-stream-fullscreen_right___UCNg",{flex:"2% 1"}],[".live-stream-fullscreen_video__PnHrq",{padding:"4px"}],
 [".live-stream-fullscreen_close__JY_lb",{margin:"0px"}],[".live-stream-fullscreen_close__JY_lb > button",{height:"30px",width:"30px"}]];
-const mapEdits = [[".house-map-panel_body__XeFna",{["--button-width"]:"33px",["--button-height"]:"33px"}],[".house-map-panel_top__lscc_",{["--horizontal-gap"]:"22px"}],[".house-map-panel_bottom__g0Ylc",{["--horizontal-gap"]:"40px"}],
-[".house-map-panel_left__NsvAM",{["--vertical-gap"]:"41px",["--button-height"]:"32px"}],[".house-map-panel_right__6UZm4",{["--vertical-gap"]:"50px"}]];
+const mapEdits = [[".house-map-panel_body__XeFna",{["--button-width"]:"33px",["--button-height"]:"33px"}],[".house-map-panel_top__lscc_",{["--horizontal-gap"]:"22px",["--button-width"]:"33px"}],[".house-map-panel_bottom__g0Ylc",{["--horizontal-gap"]:"40px"}],
+[".house-map-panel_left__NsvAM",{["--vertical-gap"]:"41px",["--button-height"]:"32px"}],[".house-map-panel_right__6UZm4",{["--vertical-gap"]:"50px",["--button-height"]:"33px"}]];
 const editStyle = function(v,editsList){
     for (let i=0; i<editsList.length; i++) {
         const e = editsList[i];
@@ -220,7 +220,8 @@ document.arrive(".chat_messages__2IBEJ",{onceOnly:true},function(chat){
 window.setTimeout(function(){
     //hide TTS at start but then show it when there's a fishtoy
     const uilast = document.querySelector(".tts-history_tts-history__8_9eB");
-    window.saveobserver123 = (new MutationObserver(function(){ uilast.style.display = "flex"; })).observe(document.querySelector(".tts-history_footer__sgV9n"),{childList:true});
+    window.saveobserver123 = (new MutationObserver(function(){ uilast.style.display = "flex"; }));
+    window.saveobserver123.observe(document.querySelector(".tts-history_footer__sgV9n"),{childList:true});
     if (initHideLast) {
         uilast.style.display = "none";
         roomElClone = document.querySelector(".tts-history_room__QNUZ0")?.cloneNode(true);
