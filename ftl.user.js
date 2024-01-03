@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     0.6
+// @version     0.7
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -13,10 +13,6 @@
 // @icon        https://www.google.com/s2/favicons?sz=64&domain=fishtank.live
 // @require     https://raw.githubusercontent.com/uzairfarooq/arrive/master/minified/arrive.min.js
 // ==/UserScript==
-
-//features: bigger player, smaller margin elements, xp bar better spot, alt background, no scanlines, HQ stream by default, 60fps smooth banner, better fishtoy popup, no popup when toggling auto, fix for stream freezing, keybind for auto
-//features (cont): persistent volume, no popup for season pass, better "last tts" (gets updated then hides itself), tts flashes room on map, hide garbage from chat
-//planned features: move giant fishtoy popup to be somewhere visible
 
 const sleep = function(s){return new Promise(resolve => setTimeout(resolve, s*1000));};
 const clickThing = function(v) {
@@ -67,38 +63,51 @@ document.arrive("main",{onceOnly:true,existing:true},function(v){
     v.style.gridTemplateColumns = "220px auto 360px 360px";
 });
 
-
-document.arrive(".live-stream-fullscreen_live-stream-fullscreen__zpNvE",async function(v){
-    v.parentElement.style.zIndex = 99;
-    v.parentElement.parentElement.style.gridRow = "3/4";
-    editStyle(v,playerEdits);
-    let playing = Date.now();
-    while (document.contains(v)) {
-        await sleep(0.2);
-        const player = v.querySelector("video");
-        if (!player) {
-            return;
+document.arrive('[id="main-panel"]',{onceOnly:true},function(m){
+    m.style.gridRow = "3/4";
+    m.arrive('[id="live-stream-player"]',async function(v){
+        //handle new player
+        v.parentElement.style.zIndex = 99;
+        editStyle(v,playerEdits);
+        let playing = Date.now();
+        while (document.contains(v)) {
+            await sleep(0.2);
+            const player = v.querySelector("video");
+            if (!player) {
+                return;
+            }
+            if (player.paused===false || player.readyState > 0) {
+                playing=Date.now();
+            } else if ((Date.now()-playing)/1000 > 3) {
+                //unfreeze the stream
+                const curcam = document.querySelector(".live-stream-fullscreen_name__C3TdW").textContent;
+                const autocams = document.querySelector(".live-streams-auto-mode_live-streams-auto-mode__pE2X_ > .checkbox_checked__ibaIs");
+                autocams?.click();
+                await sleep(0.05);
+                document.querySelector(".live-stream-fullscreen_close__JY_lb > button")?.click();
+                await sleep(0.05);
+                document.getElementById(curcam.toLowerCase().replace(" ","-"))?.click();
+                await sleep(0.1);
+                autocams?.click();
+                return;
+            }
+            const slider = document.querySelector(".live-stream-volume_slider__s0Oqh");
+            if (slider) {
+                player.volume = slider.valueAsNumber/100;
+            }
         }
-        if (player.paused===false || player.readyState > 0) {
-            playing=Date.now();
-        } else if ((Date.now()-playing)/1000 > 3) {
-            //unfreeze the stream
-            const curcam = document.querySelector(".live-stream-fullscreen_name__C3TdW").textContent;
-            const autocams = document.querySelector(".live-streams-auto-mode_live-streams-auto-mode__pE2X_ > .checkbox_checked__ibaIs");
-            autocams?.click();
-            await sleep(0.05);
-            document.querySelector(".live-stream-fullscreen_close__JY_lb > button")?.click();
-            await sleep(0.05);
-            document.getElementById(curcam.toLowerCase().replace(" ","-"))?.click();
-            await sleep(0.1);
-            autocams?.click();
-            return;
-        }
-        const slider = document.querySelector(".live-stream-volume_slider__s0Oqh");
-        if (slider) {
-            player.volume = slider.valueAsNumber/100;
-        }
-    }
+    });
+    m.arrive(".happening_item__Y7BtW",async function(v){
+        //move the big fishtoy popup
+        await sleep(0.2)
+        v.style.fontSize = "25px";
+        const clone = v.parentElement.parentElement.cloneNode(true);
+        clone.style.height = "75%";
+        clone.style.top = "6%";
+        document.getElementById("chat-messages")?.parentElement.appendChild(clone);
+        await sleep(5);
+        clone.remove();
+    });
 });
 document.arrive(".house-map-panel_house-map-panel__yJhI_",function(v){
     editStyle(v,mapEdits);
@@ -147,7 +156,8 @@ document.arrive(".toast_message__l35K3 > h3",function(v){
 //chat stuff
 let initHideLast = true;
 let roomElClone = null;
-document.arrive(".chat_messages__2IBEJ > div > div",async function(v){
+document.arrive('[id="chat-messages"] > div',async function(v){
+    v.parentElement.parentElement.style.padding = "0px";
     for (const[set,value] of Object.entries(settings)) {
         if (set.substring(0,2)=="CH" && (v.className.substring(0,set.length+11) === "chat-message-"+set.substring(2))) {
             if (value===true) {
@@ -214,19 +224,16 @@ document.arrive(".chat_messages__2IBEJ > div > div",async function(v){
         }
     }
 });
-document.arrive(".chat_messages__2IBEJ",{onceOnly:true},function(chat){
-    chat.style.padding = "0px";
-});
-window.setTimeout(function(){
-    //hide TTS at start but then show it when there's a fishtoy
-    const uilast = document.querySelector(".tts-history_tts-history__8_9eB");
-    window.saveobserver123 = (new MutationObserver(function(){ uilast.style.display = "flex"; }));
-    window.saveobserver123.observe(document.querySelector(".tts-history_footer__sgV9n"),{childList:true});
+document.arrive(".tts-history_tts-history__8_9eB",{onceOnly:true},async function(uilast){
+    //hide last tts at start then show again when there's a fishtoy
+    await sleep(2);
+    uilast.leave("div",function(){ uilast.style.display = "flex"; });
+    roomElClone = uilast.querySelector(".tts-history_room__QNUZ0")?.cloneNode(true);
+    await sleep(10);
     if (initHideLast) {
         uilast.style.display = "none";
-        roomElClone = document.querySelector(".tts-history_room__QNUZ0")?.cloneNode(true);
     }
-},12*1000);
+});
 
 //settings ui
 let ourBtn = null;
@@ -260,6 +267,7 @@ const onSetBtnClick = function() {
         lbl.textContent = setDesc;
         lbl.style.color = "black";
         lbl.style.fontSize = "22px";
+        lbl.style.fontWeight = "500";
         container.appendChild(lbl);
         if (typeof(settings[setKey]) === "boolean") {
             //bool button
