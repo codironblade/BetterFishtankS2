@@ -14,7 +14,7 @@ A small userscript that improves your fishtank experience. Target site: https://
 - 60fps smooth banner
 - better fishtoy popup
 - no popup when toggling auto
-- keybinds for: autocam [.], chat [/], mute [M]
+- keybinds for: mute [M], autocam [,], chat [/]
 - persistent volume
 - no popup for season pass
 - better "last tts" (gets updated then hides itself)
