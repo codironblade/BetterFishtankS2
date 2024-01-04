@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     0.7
+// @version     0.75
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -21,7 +21,7 @@ const clickThing = function(v) {
 }
 const roomMapArray = [[5,2],[3,5],[3,2],[3,3],[3,4],[5,3],[5,4],[5,5],[6,3],[4,6],[4,5]];
 const roomMapDict = {["bedroom 1"]:[5,2],["bedroom 2"]:[3,5],["bedroom 3"]:[3,2],["bunk"]:[3,3],["hallway upstairs"]:[3,4],["hallway downstairs"]:[5,3],["living room"]:[5,4],["lounge"]:[5,5],["bar"]:[6,3],["kitchen"]:[4,6],["dog house"]:[4,5]};
-const settings = {CHtts:false,CHsfx:false,CHemote:false,CHhappening:false,CHsystem:false,CHclan:false,CHdefault:false,ttstime:51,bg:"Blue"};
+const settings = {CHtts:false,CHsfx:false,CHemote:false,CHhappening:false,CHsystem:false,CHclan:false,CHdefault:false,ttstime:45,bg:"Blue"};
 const settingsInfo = [["CHtts","Chat hide TTS"],["CHsfx","Chat hide SFX"],["CHemote","Chat hide emotes/commands"],["CHhappening","Chat hide items"],["CHsystem","Chat hide system"],["CHclan","Chat hide clan stuff"],
                       ["CHdefault","Chat hide chats"],["ttstime","TTS popup seconds"],["bg","Background Image","Blue","Dark","Default"]];
 const savedStr = GM_getValue("ftlsave");
@@ -105,7 +105,7 @@ document.arrive('[id="main-panel"]',{onceOnly:true},function(m){
         clone.style.height = "75%";
         clone.style.top = "6%";
         document.getElementById("chat-messages")?.parentElement.appendChild(clone);
-        await sleep(5);
+        await sleep(6);
         clone.remove();
     });
 });
@@ -164,40 +164,40 @@ document.arrive('[id="chat-messages"] > div',async function(v){
                 v.style.display = "none";
                 //v.style.backgroundColor = "red";
             }
-            if (set !== "CHtts") {
+            if ((set !== "CHtts") || (!roomElClone)) {
                 return;
             }
             //update the "last tts" because wes won't
-            initHideLast = false;
             await sleep(0.5);
+            const text = v.querySelector(".chat-message-tts_message__sWVCc").textContent;
+            const textElement = document.querySelector(".tts-history_text__ZVdV8");
+            const roomElement = document.querySelector(".tts-history_room__QNUZ0");
+            const timeElement = document.querySelector(".tts-history_timestamp__mVYdp");
+            const roomText = v.querySelector(".chat-message-tts_room__1lmqo").textContent.toLowerCase();
+            if (!timeElement) {
+                return;
+            }
+            initHideLast = false;
             document.querySelector(".tts-history_title__sfog8").childNodes[0].textContent = "New TTS";
             const userNodes = document.querySelector(".tts-history_user__Wzyf_").childNodes;
             if (userNodes.length>1) {
                 userNodes[0].style.display = "none";
             }
             userNodes[userNodes.length-1].textContent = v.querySelector(".chat-message-tts_from__1QSqc").textContent;
-            const text = v.querySelector(".chat-message-tts_message__sWVCc").textContent;
-            const textElement = document.querySelector(".tts-history_text__ZVdV8");
-            const roomElement = document.querySelector(".tts-history_room__QNUZ0");
-            const timeElement = document.querySelector(".tts-history_timestamp__mVYdp");
-            const roomText = v.querySelector(".chat-message-tts_room__1lmqo").textContent.toLowerCase();
-            const roomPair = roomMapDict[roomText];
             textElement.style.color = "#ff1d00";
             textElement.style.animationTimingFunction = "steps(600, start)";
             textElement.style.textShadow = "0 0 8px #bd0000";
             textElement.textContent = text;
             if (roomElement) {
                 roomElement.textContent = roomText;
-                if (!roomElClone) {
-                    roomElClone = roomElement.cloneNode(true);
-                }
-            } else if (roomElClone) {
+            } else {
                 roomElClone.textContent = roomText;
                 timeElement.parentElement.prepend(roomElClone);
                 roomElClone = roomElClone.cloneNode(true);
             }
             timeElement.textContent = v.querySelector(".chat-message-tts_timestamp__pIVv0").textContent;
             document.querySelector(".tts-history_tts-history__8_9eB").style.display = "flex";
+            const roomPair = roomMapDict[roomText];
             if (roomPair) {
                 //highlight tts on map
                 const btnContainer = document.querySelector(".house-map-panel_click-area__xswcw:nth-child("+(roomPair[0])+")");
@@ -224,12 +224,13 @@ document.arrive('[id="chat-messages"] > div',async function(v){
         }
     }
 });
-document.arrive(".tts-history_tts-history__8_9eB",{onceOnly:true},async function(uilast){
+document.arrive(".tts-history_room__QNUZ0",{onceOnly:true},async function(v){
     //hide last tts at start then show again when there's a fishtoy
-    await sleep(2);
+    await sleep(0.2);
+    const uilast = v.parentElement.parentElement.parentElement;
     uilast.leave("div",function(){ uilast.style.display = "flex"; });
-    roomElClone = uilast.querySelector(".tts-history_room__QNUZ0")?.cloneNode(true);
-    await sleep(10);
+    roomElClone = v.cloneNode(true);
+    await sleep(12);
     if (initHideLast) {
         uilast.style.display = "none";
     }
@@ -365,25 +366,14 @@ document.addEventListener("keydown", function(event) {
     if (event.isComposing || document.activeElement?.selectionStart !== undefined || document.activeElement?.isContentEditable) {
         return;
     }
-    let keyn = parseInt(event.key);
-    if (event.key === "-") {
-        keyn = 11;
-    } else if (keyn === 0 || event.key === "*") {
-        keyn = 10;
-    }
-
-    if (keyn) {
-        //disabled numpad navigation due to wes' worse implementation
-        //const btnContainer = document.querySelector(".house-map-panel_click-area__xswcw:nth-child("+(roomMapArray[keyn-1][0])+")");
-        //btnContainer?.querySelector("button:nth-child("+(roomMapArray[keyn-1][1])+")")?.click();
-    } else if (event.key === "m") {
+    if (event.key === "m") {
         if (document.activeElement?.classList.contains("livepeer-aspect-ratio-container")) {
             document.activeElement?.blur();
         }
         const slider = document.querySelector(".live-stream-volume_slider__s0Oqh");
         slider.value = (slider.valueAsNumber>0) ? 0 : 100;
         slider.dispatchEvent(new CustomEvent("input", { bubbles: true, cancelable: true }));
-    } else if (event.key === ".") {
+    } else if (event.key === "," || event.keyCode === 190) {
         document.querySelector(".live-streams-auto-mode_live-streams-auto-mode__pE2X_ > label")?.click();
         document.activeElement?.blur();
     } else if (event.keyCode === 191) { // slash
