@@ -10,11 +10,11 @@ A small userscript that improves your fishtank experience. Target site: https://
 - alt background
 - no scanlines
 - HQ stream by default
+- fix for stream freezing
 - 60fps smooth banner
 - better fishtoy popup
 - no popup when toggling auto
-- fix for stream freezing
-- keybind for auto (. button aka period)
+- keybinds for: autocam [.], chat [/], mute [M]
 - persistent volume
 - no popup for season pass
 - better "last tts" (gets updated then hides itself)
@@ -25,5 +25,5 @@ Settings can be found here:
 
 ![brave_2024-01-01_22-15-23](https://github.com/codironblade/BetterFishtankS2/assets/133949229/51351b67-e8c3-4f6f-a18c-b6da93c75a11)
 
-Shout another ftl script: [maejok tools](https://github.com/maejok-xx/maejok-tools)
+Shoutout another ftl script: [maejok tools](https://github.com/maejok-xx/maejok-tools)
 I'm not affiliated with them and don't check compatibility
