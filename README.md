@@ -20,6 +20,7 @@ A small userscript that improves your fishtank experience. Target site: https://
 - better "last tts" (gets updated then hides itself)
 - tts flashes room on map
 - hide garbage from chat
+- download button on clips
 
 Settings can be found here:
 
