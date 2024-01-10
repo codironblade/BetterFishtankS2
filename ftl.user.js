@@ -63,9 +63,9 @@ document.arrive("main",{onceOnly:true,existing:true},function(v){
     v.style.gridTemplateColumns = "220px auto 360px 360px";
 });
 
-document.arrive('[id="main-panel"]',{onceOnly:true},function(m){
+document.arrive("#main-panel",{onceOnly:true},function(m){
     m.style.gridRow = "3/4";
-    m.arrive('[id="live-stream-player"]',async function(v){
+    m.arrive("#live-stream-player",async function(v){
         //handle new player
         v.parentElement.style.zIndex = 99;
         editStyle(v,playerEdits);
@@ -154,9 +154,20 @@ document.arrive(".toast_message__l35K3 > h3",function(v){
 })
 
 //chat stuff
-let initHideLast = true;
-let roomElClone = null;
-document.arrive('[id="chat-messages"] > div',async function(v){
+let ttsid = 0;
+let ttsdate = 0;
+const ttsEdit = function(disp){
+    document.querySelector(".tts-history_tts-history__8_9eB").style.display = disp;
+}
+const ttsmu = (new MutationObserver(function(){
+    ttsEdit("flex");
+    if ((Date.now()-ttsdate)/1000 > 0.2) {
+        document.querySelector(".tts-history_text__ZVdV8").style.color="cyan";
+    }
+    window.clearTimeout(ttsid);
+    ttsid = window.setTimeout(ttsEdit,settings.ttstime*1000,"none");
+}));
+document.arrive("#chat-messages > div",async function(v){
     v.parentElement.parentElement.style.padding = "0px";
     for (const[set,value] of Object.entries(settings)) {
         if (set.substring(0,2)=="CH" && (v.className.substring(0,set.length+11) === "chat-message-"+set.substring(2))) {
@@ -164,12 +175,12 @@ document.arrive('[id="chat-messages"] > div',async function(v){
                 v.style.display = "none";
                 //v.style.backgroundColor = "red";
             }
-            if ((set !== "CHtts") || (!roomElClone)) {
+            if (set !== "CHtts") {
                 return;
             }
-            //update the "last tts" because wes won't
+            //update the "last tts"
             await sleep(0.5);
-            const text = v.querySelector(".chat-message-tts_message__sWVCc").textContent;
+            let text = v.querySelector(".chat-message-tts_message__sWVCc").textContent;
             const textElement = document.querySelector(".tts-history_text__ZVdV8");
             const roomElement = document.querySelector(".tts-history_room__QNUZ0");
             const timeElement = document.querySelector(".tts-history_timestamp__mVYdp");
@@ -177,7 +188,7 @@ document.arrive('[id="chat-messages"] > div',async function(v){
             if (!timeElement) {
                 return;
             }
-            initHideLast = false;
+            ttsdate = Date.now();
             document.querySelector(".tts-history_title__sfog8").childNodes[0].textContent = "New TTS";
             const userNodes = document.querySelector(".tts-history_user__Wzyf_").childNodes;
             if (userNodes.length>1) {
@@ -187,23 +198,27 @@ document.arrive('[id="chat-messages"] > div',async function(v){
             textElement.style.color = "#ff1d00";
             textElement.style.animationTimingFunction = "steps(600, start)";
             textElement.style.textShadow = "0 0 8px #bd0000";
-            textElement.textContent = text;
+            if (textElement.childNodes[1]) {
+                text += " | last toy";
+            }
+            textElement.childNodes[0].textContent = text;
+            ttsmu.observe(textElement.childNodes[0],{characterData:true})
             if (roomElement) {
                 roomElement.textContent = roomText;
             } else {
-                roomElClone.textContent = roomText;
-                timeElement.parentElement.prepend(roomElClone);
-                roomElClone = roomElClone.cloneNode(true);
+                const re = document.createElement("div");
+                re.className="tts-history_room__QNUZ0";
+                re.textContent = roomText;
+                timeElement.parentElement.prepend(re);
             }
             timeElement.textContent = v.querySelector(".chat-message-tts_timestamp__pIVv0").textContent;
-            document.querySelector(".tts-history_tts-history__8_9eB").style.display = "flex";
             const roomPair = roomMapDict[roomText];
             if (roomPair) {
                 //highlight tts on map
                 const btnContainer = document.querySelector(".house-map-panel_click-area__xswcw:nth-child("+(roomPair[0])+")");
                 const roomBtn = btnContainer?.querySelector("button:nth-child("+(roomPair[1])+")");
                 if (roomBtn) {
-                    for (let i=0; i<Math.min(6,settings.ttstime); i++) {
+                    for (let i=0; i<Math.min(5,settings.ttstime); i++) {
                         const curcam = document.querySelector(".live-stream-fullscreen_name__C3TdW")?.textContent.toLowerCase();
                         if (curcam !== roomText) {
                             roomBtn.style.opacity = "50%";
@@ -216,25 +231,27 @@ document.arrive('[id="chat-messages"] > div',async function(v){
                     }
                 }
             }
-            await sleep(settings.ttstime-6);
-            if (textElement.textContent === text) {
-                document.querySelector(".tts-history_tts-history__8_9eB").style.display = "none";
-            }
             return;
         }
     }
 });
-document.arrive(".tts-history_room__QNUZ0",{onceOnly:true},async function(v){
-    //hide last tts at start then show again when there's a fishtoy
-    await sleep(0.2);
-    const uilast = v.parentElement.parentElement.parentElement;
-    uilast.leave("div",function(){ uilast.style.display = "flex"; });
-    roomElClone = v.cloneNode(true);
-    await sleep(12);
-    if (initHideLast) {
-        uilast.style.display = "none";
+document.arrive(".tts-history_text__ZVdV8",{onceOnly:true},async function(v){
+    //hide last tts at start
+    await sleep(3);
+    ttsmu.observe(v.childNodes[0],{characterData:true})
+    await sleep(15);
+    if (ttsid === 0) {
+        v.parentElement.parentElement.parentElement.style.display = "none";
     }
 });
+//quieter fishtoy
+const oldPlay = HTMLAudioElement.prototype.play;
+HTMLAudioElement.prototype.play = function () {
+    if (this.src.substring(33) === "fishtoy.wav") {
+        this.volume = this.volume / 3;
+    }
+    return oldPlay.apply(this);
+}
 
 //settings ui
 let ourBtn = null;
@@ -360,6 +377,19 @@ document.arrive(".settings-modal_password___da3r  > button > div",function(toclo
     ourBtn.querySelector("button > div").textContent = "SCRIPT";
     ourBtn.querySelector("button").addEventListener("click",onSetBtnClick);
 })
+//download button for clips
+document.arrive(".clip-player_date__Xk3xl",{existing:true},function(v){
+    const btn = document.createElement("button");
+    btn.title="Download";
+    btn.style.height = "35px";
+    btn.style.width = "35px";
+    btn.style.backgroundColor = "transparent";
+    btn.insertAdjacentHTML("afterbegin",'<svg viewBox="0 2 24 24" fill="none"><path d="M12 16L12 8M9 13L11.913 15.913V15.913C11.961 15.961 12.039 15.961 12.087 15.913V15.913L15 13M3 15L3 16L3 19C3 20.1046 3.89543 21 5 21L19 21C20.1046 21 21 20.1046 21 19L21 16L21 15" stroke="#FFFFFF" stroke-width="1.5"></path></svg>');
+    v.parentElement.parentElement.appendChild(btn);
+    btn.addEventListener("click",function(){
+        window.open(document.querySelector('video[role="video"]').src);
+    });
+});
 
 //keyboard input
 document.addEventListener("keydown", function(event) {
