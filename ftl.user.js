@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     0.8
+// @version     0.85
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -19,11 +19,11 @@ const clickThing = function(v) {
     v.click();
     document.activeElement?.blur();
 }
-const roomMapArray = [[5,2],[3,5],[3,2],[3,3],[3,4],[5,3],[5,4],[5,5],[6,3],[4,6],[4,5]];
-const roomMapDict = {["bedroom 1"]:[5,2],["bedroom 2"]:[3,5],["bedroom 3"]:[3,2],["bunk"]:[3,3],["hallway upstairs"]:[3,4],["hallway downstairs"]:[5,3],["living room"]:[5,4],["lounge"]:[5,5],["bar"]:[6,3],["kitchen"]:[4,6],["dog house"]:[4,5]};
-const settings = {CHtts:false,CHsfx:false,CHemote:false,CHhappening:false,CHsystem:false,CHclan:false,CHdefault:false,ttstime:45,bg:"Blue"};
+const roomMapArray = [[5,2],[3,6],[3,2],[3,3],[3,5],[5,5],[5,6],[5,7],[6,3],[4,6],[4,5]];
+const roomMapDict = {["bedroom 1"]:[5,2],["bedroom 2"]:[3,6],["bedroom 3"]:[3,2],["bunk"]:[3,3],["hallway upstairs"]:[3,5],["hallway downstairs"]:[5,5],["living room"]:[5,6],["lounge"]:[5,7],["bar"]:[6,3],["kitchen"]:[4,6],["dog house"]:[4,5]};
+const settings = {CHtts:false,CHsfx:false,CHemote:false,CHhappening:false,CHsystem:false,CHclan:false,CHdefault:false,ttstime:45,bg:"Blue",muteAll:false};
 const settingsInfo = [["CHtts","Chat hide TTS"],["CHsfx","Chat hide SFX"],["CHemote","Chat hide emotes/commands"],["CHhappening","Chat hide items"],["CHsystem","Chat hide system"],["CHclan","Chat hide clan stuff"],
-                      ["CHdefault","Chat hide chats"],["ttstime","TTS popup seconds"],["bg","Background Image","Blue","Dark","Default"]];
+                      ["CHdefault","Chat hide chats"],["ttstime","TTS popup seconds"],["bg","Background Image","Blue","Dark","Default"],["muteAll","Mute all UI sounds"]];
 const savedStr = GM_getValue("ftlsave");
 //console.log("savedStr:",savedStr);
 for (const [k,v] of Object.entries( savedStr ? JSON.parse(savedStr) : {} )) {
@@ -34,8 +34,8 @@ const save = function(){
 }
 const playerEdits = [[".live-stream-fullscreen_left__idsvZ",{flex:"2% 1"}],[".live-stream-fullscreen_right___UCNg",{flex:"2% 1"}],[".live-stream-fullscreen_video__PnHrq",{padding:"4px"}],
 [".live-stream-fullscreen_close__JY_lb",{margin:"0px"}],[".live-stream-fullscreen_close__JY_lb > button",{height:"30px",width:"30px"}]];
-const mapEdits = [[".house-map-panel_body__XeFna",{["--button-width"]:"33px",["--button-height"]:"33px"}],[".house-map-panel_top__lscc_",{["--horizontal-gap"]:"22px",["--button-width"]:"33px"}],[".house-map-panel_bottom__g0Ylc",{["--horizontal-gap"]:"40px"}],
-[".house-map-panel_left__NsvAM",{["--vertical-gap"]:"41px",["--button-height"]:"32px"}],[".house-map-panel_right__6UZm4",{["--vertical-gap"]:"50px",["--button-height"]:"33px"}]];
+const mapEdits = [[".house-map-panel_body__XeFna",{["--button-width"]:"33px",["--button-height"]:"33px"}],[".house-map-panel_top__lscc_",{["--horizontal-gap"]:"2px",["--button-width"]:"33px"}],[".house-map-panel_bottom__g0Ylc",{["--horizontal-gap"]:"40px"}],
+[".house-map-panel_left__NsvAM",{["--vertical-gap"]:"41px",["--button-height"]:"32px"}],[".house-map-panel_right__6UZm4",{["--vertical-gap"]:"41px",["--button-height"]:"33px"}]];
 const editStyle = function(v,editsList){
     for (let i=0; i<editsList.length; i++) {
         const e = editsList[i];
@@ -78,7 +78,7 @@ document.arrive("#main-panel",{onceOnly:true},function(m){
             }
             if (player.paused===false || player.readyState > 0) {
                 playing=Date.now();
-            } else if ((Date.now()-playing)/1000 > 3) {
+            } else if ((Date.now()-playing)/1000 > 3.5) {
                 //unfreeze the stream
                 const curcam = document.querySelector(".live-stream-fullscreen_name__C3TdW").textContent;
                 const autocams = document.querySelector(".live-streams-auto-mode_live-streams-auto-mode__pE2X_ > .checkbox_checked__ibaIs");
@@ -161,7 +161,7 @@ const ttsEdit = function(disp){
 }
 const ttsmu = (new MutationObserver(function(){
     ttsEdit("flex");
-    if ((Date.now()-ttsdate)/1000 > 0.2) {
+    if ((Date.now()-ttsdate)/1000 > 0.3) {
         document.querySelector(".tts-history_text__ZVdV8").style.color="cyan";
     }
     window.clearTimeout(ttsid);
@@ -247,7 +247,9 @@ document.arrive(".tts-history_text__ZVdV8",{onceOnly:true},async function(v){
 //quieter fishtoy
 const oldPlay = HTMLAudioElement.prototype.play;
 HTMLAudioElement.prototype.play = function () {
-    if (this.src.substring(33) === "fishtoy.wav") {
+    if (settings.muteAll) {
+        this.volume = 0;
+    } else if (this.src.substring(33) === "fishtoy.wav") {
         this.volume = this.volume / 3;
     }
     return oldPlay.apply(this);
