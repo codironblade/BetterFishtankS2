@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     0.85
+// @version     0.87
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -161,7 +161,7 @@ const ttsEdit = function(disp){
 }
 const ttsmu = (new MutationObserver(function(){
     ttsEdit("flex");
-    if ((Date.now()-ttsdate)/1000 > 0.3) {
+    if ((Date.now()-ttsdate)/1000 > 0.2 && document.querySelector('.feature-toggle-status_enabled__yN33i > img[alt^="FISHTOYS"]')) {
         document.querySelector(".tts-history_text__ZVdV8").style.color="cyan";
     }
     window.clearTimeout(ttsid);
