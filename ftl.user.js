@@ -431,11 +431,6 @@ const onLoadingArchive = async function(){
 document.arrive(".s2_body__Zco_w",{existing:true},function(s2body){
     s2body.style.width = "1240px";
     archiveState.init = true;
-    s2body.arrive(".footer_footer__mQF6i > button",{existing:true},function(v){
-        if (document.location.href.indexOf("archive") > -1) {
-            v.remove();
-        }
-    });
     s2body.arrive(".s2_download__ji7Ga",function(v){
         v.style.position = "absolute";
         v.style.left = "88%";
@@ -499,6 +494,11 @@ document.arrive(".s2_body__Zco_w",{existing:true},function(s2body){
         }
         lbl.parentElement.append(clone);
     });
+});
+document.arrive(".footer_footer__mQF6i > button",{existing:true},function(v){
+    if (document.location.href.indexOf("archive") > -1) {
+        v.remove();
+    }
 });
 //keyboard input
 document.addEventListener("keydown", function(event) {
