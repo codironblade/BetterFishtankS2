@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     0.87
+// @version     0.9
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -48,7 +48,7 @@ const editStyle = function(v,editsList){
 }
 document.arrive(".background_background__fNMDL",{onceOnly:true,existing:true},function(v){
     if (settings.bg === "Blue") {
-        v.style.backgroundImage = "url(https://cdn.discordapp.com/attachments/618941660453142529/1190422264110391407/altbg.jpg)";
+        v.style.backgroundImage = "url(https://i.imgur.com/mbrRNrf.jpeg)";
     } else if (settings.bg === "Dark") {
         v.style.backgroundImage = "none";
         v.style.backgroundColor = "#171616";
@@ -349,7 +349,7 @@ const onSetBtnClick = function() {
                 if (setKey === "bg") {
                     const back = document.querySelector(".background_background__fNMDL");
                     if (settings.bg === "Blue") {
-                        back.style.backgroundImage = "url(https://cdn.discordapp.com/attachments/618941660453142529/1190422264110391407/altbg.jpg)";
+                        back.style.backgroundImage = "url(https://i.imgur.com/mbrRNrf.jpeg)";
                     } else if (settings.bg === "Dark") {
                         back.style.backgroundImage = "none";
                         back.style.backgroundColor = "#171616";
@@ -392,7 +392,114 @@ document.arrive(".clip-player_date__Xk3xl",{existing:true},function(v){
         window.open(document.querySelector('video[role="video"]').src);
     });
 });
-
+//S2 ARCHIVE
+const archiveState = {r:'',d:'',h:'',v:null};
+const onLoadingArchive = async function(){
+    archiveState.init = false;
+    await sleep(0.06);
+    const selectLabels = document.querySelectorAll(".select_current__qZY2v");
+    selectLabels.forEach(function(e){ e.style.color=null; });
+    const newState = {r:selectLabels[0].textContent,d:selectLabels[1].textContent,h:selectLabels[2].textContent};
+    if (newState.r !== archiveState.r) {
+        if (newState.d.length === 0) {
+            archiveState.doseek = true;
+            let anyRed = false;
+            const oldSet = settings.muteAll;
+            settings.muteAll = true;
+            for (let i=1; i<3; i++) {
+                const stateKey = (i===1 ? "d" : "h")
+                const label = selectLabels[i];
+                const btn1 = Array.from(label.parentElement.nextElementSibling.children).find(btn => btn.firstElementChild.textContent === archiveState[stateKey]);
+                label.textContent = archiveState[stateKey];
+                newState[stateKey] = archiveState[stateKey];
+                if (anyRed || !btn1) {
+                    label.style.color = "red";
+                    anyRed = true
+                }
+                if (btn1) {
+                    btn1.click();
+                    await sleep(0.2);
+                }
+            }
+            settings.muteAll = oldSet;
+        }
+    } else {
+        archiveState.doseek = false;
+    }
+    archiveState.r = newState.r; archiveState.d = newState.d; archiveState.h = newState.h;
+};
+document.arrive(".s2_body__Zco_w",{existing:true},function(s2body){
+    s2body.style.width = "1240px";
+    archiveState.init = true;
+    s2body.arrive(".footer_footer__mQF6i > button",{existing:true},function(v){
+        if (document.location.href.indexOf("archive") > -1) {
+            v.remove();
+        }
+    });
+    s2body.arrive(".s2_download__ji7Ga",function(v){
+        v.style.position = "absolute";
+        v.style.left = "88%";
+    });
+    s2body.arrive(".s2_video__C3TBK > video",function(v){
+        v.style.height = "auto";
+        v.parentElement.style.height = "auto";
+        v.autoplay=true;
+        if (archiveState.v) {
+            v.volume = archiveState.v.volume;
+            v.muted = archiveState.v.muted;
+            if (archiveState.doseek) {
+                v.currentTime = archiveState.v.currentTime;
+                v.autoplay = !archiveState.paused2;
+            } else {
+                archiveState.paused2 = false;
+            }
+        }
+        v.addEventListener("pause", function(){
+            //if autopause on removal then confirmed wasn't paused
+            archiveState.paused2 = document.contains(v);
+        });
+        archiveState.v = v;
+        if (archiveState.init) {
+            onLoadingArchive();
+        }
+    });
+    s2body.arrive(".s2_loading__U68cP",onLoadingArchive);
+    s2body.arrive(".select_option__lVOGV > span:not(.date)",function(lbl){
+        //adds date help to dropdown menu
+        if (s2body.querySelector(".s2_options__jWVWM").firstElementChild.contains(lbl)) {
+            //room
+            return;
+        }
+        const clone = lbl.cloneNode();
+        clone.style.color = "gray";
+        clone.style.position = "absolute";
+        clone.style.left = "60px";
+        clone.className = "date";
+        if (s2body.querySelector(".s2_options__jWVWM").lastElementChild.contains(lbl)) {
+            //hour
+            let hour = parseInt(lbl.textContent);
+            hour = hour - 3;
+            if (hour < 0) {
+                hour = hour + 24;
+            }
+            clone.textContent = ((hour + 11) % 12 + 1) + (hour >= 12 ? " PM":" AM");
+        } else {
+            //day
+            let n = parseInt(lbl.textContent);
+            let mo = "Dec ";
+            n = n + 16;
+            if (n > 31) {
+                n = n - 31;
+                mo = "Jan ";
+                if (n < 10) {
+                    n = "0"+n;
+                }
+            }
+            clone.textContent = mo+n;
+        }
+        lbl.parentElement.append(clone);
+    });
+});
 //keyboard input
 document.addEventListener("keydown", function(event) {
     if (event.isComposing || document.activeElement?.selectionStart !== undefined || document.activeElement?.isContentEditable) {
