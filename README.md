@@ -5,6 +5,7 @@ A small userscript that improves your fishtank experience. Target site: https://
 (Requires tampermonkey / violentmonkey / greasemonkey)
 
 ## Features
+- ARCHIVE (april 2024): remembers date and seek-position allowing to switch rooms like it were live. also better UI like bigger player.
 - bigger player
 - smaller margin elements
 - alt background
@@ -15,7 +16,6 @@ A small userscript that improves your fishtank experience. Target site: https://
 - better fishtoy popup
 - no popup when toggling auto
 - keybinds for: mute [M], autocam [,], chat [/]
-- persistent volume
 - no popup for season pass
 - better "last tts" (gets updated then hides itself)
 - tts flashes room on map
