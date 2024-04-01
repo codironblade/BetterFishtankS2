@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     0.9
+// @version     0.91
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -473,7 +473,7 @@ document.arrive(".s2_body__Zco_w",{existing:true},function(s2body){
         if (s2body.querySelector(".s2_options__jWVWM").lastElementChild.contains(lbl)) {
             //hour
             let hour = parseInt(lbl.textContent);
-            hour = hour - 3;
+            hour = hour - 2;
             if (hour < 0) {
                 hour = hour + 24;
             }
