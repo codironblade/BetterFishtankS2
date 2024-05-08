@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     0.91
+// @version     0.93
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -285,7 +285,7 @@ const onSetBtnClick = function() {
         container.style.alignItems = "center";
         const lbl = document.createElement("span");
         lbl.textContent = setDesc;
-        lbl.style.color = "black";
+        lbl.style.color = "white";
         lbl.style.fontSize = "22px";
         lbl.style.fontWeight = "500";
         container.appendChild(lbl);
@@ -370,6 +370,7 @@ const onSetBtnClick = function() {
     }));
     mut.observe(m,{childList:true});
 }
+/*/ old ui
 document.arrive(".settings-modal_password___da3r  > button > div",function(tocloned){
     if (document.contains(ourBtn)) {
         return;
@@ -378,6 +379,17 @@ document.arrive(".settings-modal_password___da3r  > button > div",function(toclo
     tocloned.parentElement.parentElement.parentElement.appendChild(ourBtn);
     ourBtn.querySelector("button > div").textContent = "SCRIPT";
     ourBtn.querySelector("button").addEventListener("click",onSetBtnClick);
+})
+/*/
+document.arrive(".settings-modal_password___da3r",function(tocloned){
+    //new ui
+    if (document.contains(ourBtn)) {
+        return;
+    }
+    ourBtn = tocloned.cloneNode(true);
+    tocloned.parentElement.appendChild(ourBtn);
+    ourBtn.textContent = "SCRIPT";
+    ourBtn.addEventListener("click",onSetBtnClick);
 })
 //download button for clips
 document.arrive(".clip-player_date__Xk3xl",{existing:true},function(v){
@@ -389,7 +401,7 @@ document.arrive(".clip-player_date__Xk3xl",{existing:true},function(v){
     btn.insertAdjacentHTML("afterbegin",'<svg viewBox="0 2 24 24" fill="none"><path d="M12 16L12 8M9 13L11.913 15.913V15.913C11.961 15.961 12.039 15.961 12.087 15.913V15.913L15 13M3 15L3 16L3 19C3 20.1046 3.89543 21 5 21L19 21C20.1046 21 21 20.1046 21 19L21 16L21 15" stroke="#FFFFFF" stroke-width="1.5"></path></svg>');
     v.parentElement.parentElement.appendChild(btn);
     btn.addEventListener("click",function(){
-        window.open(document.querySelector('video[role="video"]').src);
+        window.open(document.querySelector('video').src);
     });
 });
 //S2 ARCHIVE
@@ -453,6 +465,16 @@ document.arrive(".s2_body__Zco_w",{existing:true},function(s2body){
             //if autopause on removal then confirmed wasn't paused
             archiveState.paused2 = document.contains(v);
         });
+        v.addEventListener("error",function(){
+            //reload properly when it errors instead of freezing
+            const t = v.currentTime;
+            v.addEventListener("loadstart",function(){v.currentTime=t},{once:true});
+            sleep(0.33).then(function(){
+                if (v.error && v.error.message.length>1) {
+                    v.load();
+                }
+            });
+        });
         archiveState.v = v;
         if (archiveState.init) {
             onLoadingArchive();
@@ -495,7 +517,7 @@ document.arrive(".s2_body__Zco_w",{existing:true},function(s2body){
         lbl.parentElement.append(clone);
     });
 });
-document.arrive(".footer_footer__mQF6i > button",{existing:true},function(v){
+document.arrive(".footer_shop__HhQQ3",{existing:true},function(v){
     if (document.location.href.indexOf("archive") > -1) {
         v.remove();
     }
