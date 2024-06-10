@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     0.95
+// @version     0.96
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -63,8 +63,8 @@ document.arrive(".background_background__fNMDL",{onceOnly:true,existing:true},fu
     document.body.appendChild(removeFilter);
 });
 document.arrive("main",{onceOnly:true,existing:true},function(v){
-    v.style.gridTemplateRows = "52px auto 1fr auto";
-    v.style.gridTemplateColumns = "204px auto 340px";
+    v.style.gridTemplateRows = "5% auto 1fr auto";
+    v.style.gridTemplateColumns = "10% auto 16.7%";
 });
 
 document.arrive("#main-panel",{onceOnly:true},function(m){
@@ -75,7 +75,7 @@ document.arrive("#main-panel",{onceOnly:true},function(m){
         //editStyle(v,playerEdits);
     });
     m.arrive("#livepeer-video-player > div > div",function(v){
-        v.style.height="95%";
+        v.style.height="94%";
     });
     m.arrive(".happening_item__Y7BtW",async function(v){
         //move the big fishtoy popup
