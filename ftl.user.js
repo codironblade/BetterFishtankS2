@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     0.94
+// @version     0.95
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -64,15 +64,18 @@ document.arrive(".background_background__fNMDL",{onceOnly:true,existing:true},fu
 });
 document.arrive("main",{onceOnly:true,existing:true},function(v){
     v.style.gridTemplateRows = "52px auto 1fr auto";
-    v.style.gridTemplateColumns = "220px auto 360px";
+    v.style.gridTemplateColumns = "204px auto 340px";
 });
 
 document.arrive("#main-panel",{onceOnly:true},function(m){
     //m.style.gridRow = "3/4";
-    m.arrive("#live-stream-player",async function(v){
+    m.arrive("#live-stream-player",function(v){
         //handle new player
         v.parentElement.style.zIndex = 99;
         //editStyle(v,playerEdits);
+    });
+    m.arrive("#livepeer-video-player > div > div",function(v){
+        v.style.height="95%";
     });
     m.arrive(".happening_item__Y7BtW",async function(v){
         //move the big fishtoy popup
@@ -86,6 +89,13 @@ document.arrive("#main-panel",{onceOnly:true},function(m){
         clone.remove();
     });
 });
+document.arrive(".inventory_slots__D4IrC",{onceOnly:true},function(v){
+    v.style.gap="6px";
+    v.style.gridTemplateColumns = "repeat(4,var(--inventory-item-size))";
+});
+document.arrive(".poll_footer__rALdX",{onceOnly:true},function(v){
+    v.style.display="block";
+})
 document.arrive(".home_left__UiQ0z",{onceOnly:true},function(v){
     document.arrive(".status-bar_xp__VzguC",{onceOnly:true,existing:true},function(e){
         v.prepend(e);
@@ -279,8 +289,8 @@ document.arrive(".settings-modal_password___da3r",function(tocloned){
 document.arrive(".clip-player_date__Xk3xl",{existing:true},function(v){
     const btn = document.createElement("button");
     btn.title="Download";
-    btn.style.height = "35px";
-    btn.style.width = "35px";
+    btn.style.height = "24px";
+    btn.style.width = "24px";
     btn.style.backgroundColor = "transparent";
     btn.insertAdjacentHTML("afterbegin",'<svg viewBox="0 2 24 24" fill="none"><path d="M12 16L12 8M9 13L11.913 15.913V15.913C11.961 15.961 12.039 15.961 12.087 15.913V15.913L15 13M3 15L3 16L3 19C3 20.1046 3.89543 21 5 21L19 21C20.1046 21 21 20.1046 21 19L21 16L21 15" stroke="#FFFFFF" stroke-width="1.5"></path></svg>');
     v.parentElement.parentElement.appendChild(btn);
@@ -418,14 +428,13 @@ document.addEventListener("keydown", function(event) {
         return;
     }
     if (event.key === "m") {
-        if (document.activeElement?.classList.contains("livepeer-aspect-ratio-container")) {
-            document.activeElement?.blur();
+        const controls = document.querySelector(".livepeer-video-player_bottom-controls__lU5b3");
+        if ((!controls) || (controls.contains(document.activeElement))) {
+            return;
         }
-        const slider = document.querySelector(".live-stream-volume_slider__s0Oqh");
-        slider.value = (slider.valueAsNumber>0) ? 0 : 100;
-        slider.dispatchEvent(new CustomEvent("input", { bubbles: true, cancelable: true }));
+        controls.querySelector("button:nth-child(2)")?.click();
     } else if (event.key === "," || event.keyCode === 190) {
-        document.querySelector(".live-streams-auto-mode_live-streams-auto-mode__pE2X_ > label")?.click();
+        document.querySelector(".status-bar_director__YrTCo")?.click();
         document.activeElement?.blur();
     } else if (event.keyCode === 191) { // slash
         window.setTimeout(function(){ document.getElementById("chat-input").focus() },99);
