@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     0.96
+// @version     0.97
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -64,7 +64,7 @@ document.arrive(".background_background__fNMDL",{onceOnly:true,existing:true},fu
 });
 document.arrive("main",{onceOnly:true,existing:true},function(v){
     v.style.gridTemplateRows = "5% auto 1fr auto";
-    v.style.gridTemplateColumns = "10% auto 16.7%";
+    v.style.gridTemplateColumns = "11% auto 16.7%";
 });
 
 document.arrive("#main-panel",{onceOnly:true},function(m){
@@ -89,16 +89,19 @@ document.arrive("#main-panel",{onceOnly:true},function(m){
         clone.remove();
     });
 });
-document.arrive(".inventory_slots__D4IrC",{onceOnly:true},function(v){
-    v.style.gap="6px";
-    v.style.gridTemplateColumns = "repeat(4,var(--inventory-item-size))";
-});
 document.arrive(".poll_footer__rALdX",{onceOnly:true},function(v){
     v.style.display="block";
 })
-document.arrive(".home_left__UiQ0z",{onceOnly:true},function(v){
-    document.arrive(".status-bar_xp__VzguC",{onceOnly:true,existing:true},function(e){
-        v.prepend(e);
+document.arrive(".top-bar-user_top-bar-user__VUdJm",{onceOnly:true},function(v){
+    v.style.zIndex=3;
+});
+document.arrive(".health_health___IPyk",{onceOnly:true},function(v){
+    document.arrive(".status-bar_xp__VzguC",{onceOnly:true,existing:true},function(xp){
+        xp.style.width = "130px";
+        xp.arrive(".experience-bar_bar__HcNkR",{onceOnly:true,existing:true},function(v2){
+            v2.style.height="100%";
+        });
+        v.parentElement.appendChild(xp);
     });
 });
 //hide season pass
@@ -117,6 +120,17 @@ document.arrive(".led-text_led__xdruo > h1",{onceOnly:true},function(h){
     h1 = h;
     smoother();
     (new MutationObserver(smoother)).observe(h1,{characterData:true,attributes:true});
+});
+//poll
+let h2 = null;
+const smoother2 = async function() {
+    h2.style.animationDuration = "7s";
+    h2.style.animationTimingFunction = "steps(420, start)";
+}
+document.arrive(".poll-question_text__PKByz",{onceOnly:true},function(h){
+    h2 = h;
+    smoother2();
+    (new MutationObserver(smoother2)).observe(h2,{characterData:true,attributes:true});
 });
 
 //default high quality
