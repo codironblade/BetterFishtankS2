@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     0.97
+// @version     0.98
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -62,20 +62,19 @@ document.arrive(".background_background__fNMDL",{onceOnly:true,existing:true},fu
     removeFilter.textContent = 'body::after { content: none }';
     document.body.appendChild(removeFilter);
 });
-document.arrive("main",{onceOnly:true,existing:true},function(v){
-    v.style.gridTemplateRows = "5% auto 1fr auto";
-    v.style.gridTemplateColumns = "11% auto 16.7%";
-});
+document.arrive("main",{existing:true},async function(main){
+    main.style.gridTemplateRows = "5% auto 1fr auto";
+    main.style.gridTemplateColumns = "11% auto 16.7%";
 
-document.arrive("#main-panel",{onceOnly:true},function(m){
+main.arrive("#main-panel",{onceOnly:true},function(m){
     //m.style.gridRow = "3/4";
     m.arrive("#live-stream-player",function(v){
         //handle new player
         v.parentElement.style.zIndex = 99;
         //editStyle(v,playerEdits);
     });
-    m.arrive("#livepeer-video-player > div > div",function(v){
-        v.style.height="94%";
+    m.arrive(".livepeer-video-player_controls__y36El",function(v){
+        v.style.inset="20px";
     });
     m.arrive(".happening_item__Y7BtW",async function(v){
         //move the big fishtoy popup
@@ -89,13 +88,13 @@ document.arrive("#main-panel",{onceOnly:true},function(m){
         clone.remove();
     });
 });
-document.arrive(".poll_footer__rALdX",{onceOnly:true},function(v){
+main.arrive(".poll_footer__rALdX",{onceOnly:true},function(v){
     v.style.display="block";
-})
-document.arrive(".top-bar-user_top-bar-user__VUdJm",{onceOnly:true},function(v){
-    v.style.zIndex=3;
 });
-document.arrive(".health_health___IPyk",{onceOnly:true},function(v){
+main.arrive(".top-bar-user_top-bar-user__VUdJm",{onceOnly:true},function(v){
+    v.style.zIndex=4;
+});
+main.arrive(".health_health___IPyk",{onceOnly:true},function(v){
     document.arrive(".status-bar_xp__VzguC",{onceOnly:true,existing:true},function(xp){
         xp.style.width = "130px";
         xp.arrive(".experience-bar_bar__HcNkR",{onceOnly:true,existing:true},function(v2){
@@ -114,9 +113,10 @@ let h1 = null;
 const smoother = function() {
     const dur = h1.style.animationDuration;
     h1.style.animationTimingFunction = "steps(" + (Number(dur.substring(0,dur.length-1))*60) +",start)";
-    h1.parentElement.style.height = "30px";
+    h1.parentElement.style.height = "25px";
+    h1.style.fontSize = "25px";
 }
-document.arrive(".led-text_led__xdruo > h1",{onceOnly:true},function(h){
+main.arrive(".led-text_led__xdruo > h1",{onceOnly:true},function(h){
     h1 = h;
     smoother();
     (new MutationObserver(smoother)).observe(h1,{characterData:true,attributes:true});
@@ -127,14 +127,15 @@ const smoother2 = async function() {
     h2.style.animationDuration = "7s";
     h2.style.animationTimingFunction = "steps(420, start)";
 }
-document.arrive(".poll-question_text__PKByz",{onceOnly:true},function(h){
+main.arrive(".poll-question_text__PKByz",{onceOnly:true},function(h){
     h2 = h;
     smoother2();
     (new MutationObserver(smoother2)).observe(h2,{characterData:true,attributes:true});
 });
 
 //default high quality
-document.arrive(".live-stream-controls_right__u0Dox > label",{onceOnly:true},clickThing);
+main.arrive(".live-stream-controls_right__u0Dox > label",{onceOnly:true},clickThing);
+});
 
 //no popup for toggling auto cams
 document.arrive(".toast_message__l35K3 > h3",function(v){
@@ -446,7 +447,11 @@ document.addEventListener("keydown", function(event) {
         if ((!controls) || (controls.contains(document.activeElement))) {
             return;
         }
-        controls.querySelector("button:nth-child(2)")?.click();
+        if (controls.children.length < 3) {
+            controls.querySelector("button")?.click();
+        } else {
+            controls.querySelector("button:nth-child(2)")?.click();
+        }
     } else if (event.key === "," || event.keyCode === 190) {
         document.querySelector(".status-bar_director__YrTCo")?.click();
         document.activeElement?.blur();
