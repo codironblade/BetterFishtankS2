@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     0.98
+// @version     0.99
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -19,7 +19,7 @@ const clickThing = function(v) {
     v.click();
     document.activeElement?.blur();
 }
-const settings = {CHtts:false,CHsfx:false,CHemote:false,CHhappening:false,CHsystem:false,CHclan:false,CHdefault:false,bgbr:40,bg:"Default",muteAll:false};
+const settings = {CHtts:false,CHsfx:false,CHemote:false,CHhappening:false,CHsystem:false,CHclan:false,CHdefault:false,bgbr:40,bg:"Blue",muteAll:false};
 const settingsInfo = [["CHtts","Chat hide TTS"],["CHsfx","Chat hide SFX"],["CHemote","Chat hide emotes/commands"],["CHhappening","Chat hide items"],["CHsystem","Chat hide system"],["CHclan","Chat hide clan stuff"],
                       ["CHdefault","Chat hide chats"],["bgbr","Background Brightness"],["bg","Background Image","Blue","Dark","S2 Green","Default"],["muteAll","Mute all UI sounds"]];
 const savedStr = GM_getValue("ftlsave");
@@ -113,8 +113,8 @@ let h1 = null;
 const smoother = function() {
     const dur = h1.style.animationDuration;
     h1.style.animationTimingFunction = "steps(" + (Number(dur.substring(0,dur.length-1))*60) +",start)";
-    h1.parentElement.style.height = "25px";
-    h1.style.fontSize = "25px";
+    h1.parentElement.style.height = "17px";
+    h1.style.fontSize = "17px";
 }
 main.arrive(".led-text_led__xdruo > h1",{onceOnly:true},function(h){
     h1 = h;
@@ -127,7 +127,7 @@ const smoother2 = async function() {
     h2.style.animationDuration = "7s";
     h2.style.animationTimingFunction = "steps(420, start)";
 }
-main.arrive(".poll-question_text__PKByz",{onceOnly:true},function(h){
+main.arrive(".poll-question_text__PKByz",{onceOnly:false},function(h){
     h2 = h;
     smoother2();
     (new MutationObserver(smoother2)).observe(h2,{characterData:true,attributes:true});
@@ -438,7 +438,8 @@ document.arrive(".footer_shop__HhQQ3",{existing:true},function(v){
     }
 });
 //keyboard input
-document.addEventListener("keydown", function(event) {
+let dirdb = false;
+document.addEventListener("keydown", async function(event) {
     if (event.isComposing || document.activeElement?.selectionStart !== undefined || document.activeElement?.isContentEditable) {
         return;
     }
@@ -452,10 +453,28 @@ document.addEventListener("keydown", function(event) {
         } else {
             controls.querySelector("button:nth-child(2)")?.click();
         }
-    } else if (event.key === "," || event.keyCode === 190) {
-        document.querySelector(".status-bar_director__YrTCo")?.click();
+    } else if (event.key === "f") {
+        if (document.fullscreen) {
+            document.exitFullscreen()
+        } else {
+            document.querySelector("video")?.requestFullscreen();
+        }
+    } else if (event.key === "," || event.key == ".") {
+        if (dirdb) return;
+        const dir = document.querySelector(".status-bar_director__YrTCo").textContent==="DirectorModeEnabled";
+        document.querySelector(".live-stream-player_close__c_GRv")?.click();
+        dirdb=true;
+        await sleep(0.2);
+        dirdb=false;
+        if (!dir) {
+            document.querySelector(".status-bar_director__YrTCo")?.click();
+        }
         document.activeElement?.blur();
     } else if (event.keyCode === 191) { // slash
         window.setTimeout(function(){ document.getElementById("chat-input").focus() },99);
+    } else if (parseInt(event.key)<7 && parseInt(event.key)>0) {
+        document.querySelector(".live-stream-player_close__c_GRv")?.click();
+        await sleep(0.2);
+        document.getElementById("player-"+event.key)?.click();
     }
 });
