@@ -5,7 +5,7 @@ A small userscript that improves your fishtank experience. Target site: https://
 (Requires tampermonkey / violentmonkey / greasemonkey)
 
 ## Features
-- keybinds for: mute [M], autocam [,], chat [/], fullscreen [F], and cams [1-6]
+- keybinds for: mute [M], autocam [, or .], chat [/], fullscreen [F], and cams [1-6]
 - No indian troll popups
 - PAID ARCHIVE: remembers date and seek-position allowing to switch rooms like it were live. also better UI
 - bigger player
