@@ -5,19 +5,17 @@ A small userscript that improves your fishtank experience. Target site: https://
 (Requires tampermonkey / violentmonkey / greasemonkey)
 
 ## Features
-- this is still getting actively updated season 2.5 layout and features
+- keybinds for: mute [M], autocam [,], chat [/], fullscreen [F], and cams [1-6]
 - No indian troll popups
-- PAID ARCHIVE: remembers date and seek-position allowing to switch rooms like it were live. also better UI like bigger player.
+- PAID ARCHIVE: remembers date and seek-position allowing to switch rooms like it were live. also better UI
 - bigger player
 - smaller margin elements
 - alt background
 - no scanlines
 - HQ stream by default
-- fix for stream freezing
 - 60fps smooth banner
 - better fishtoy popup
 - no popup when toggling auto
-- keybinds for: mute [M], autocam [,], chat [/]
 - no popup for season pass
 - better "last tts"
 - hide garbage from chat
