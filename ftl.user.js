@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     0.99
+// @version     1.0
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -438,8 +438,7 @@ document.arrive(".footer_shop__HhQQ3",{existing:true},function(v){
     }
 });
 //keyboard input
-let dirdb = false;
-document.addEventListener("keydown", async function(event) {
+document.addEventListener("keydown", function(event) {
     if (event.isComposing || document.activeElement?.selectionStart !== undefined || document.activeElement?.isContentEditable) {
         return;
     }
@@ -460,21 +459,12 @@ document.addEventListener("keydown", async function(event) {
             document.querySelector("video")?.requestFullscreen();
         }
     } else if (event.key === "," || event.key == ".") {
-        if (dirdb) return;
         const dir = document.querySelector(".status-bar_director__YrTCo").textContent==="DirectorModeEnabled";
-        document.querySelector(".live-stream-player_close__c_GRv")?.click();
-        dirdb=true;
-        await sleep(0.2);
-        dirdb=false;
-        if (!dir) {
-            document.querySelector(".status-bar_director__YrTCo")?.click();
-        }
+	document.querySelector(dir ? ".live-stream-player_close__c_GRv" : ".status-bar_director__YrTCo")?.click();
         document.activeElement?.blur();
     } else if (event.keyCode === 191) { // slash
         window.setTimeout(function(){ document.getElementById("chat-input").focus() },99);
     } else if (parseInt(event.key)<7 && parseInt(event.key)>0) {
-        document.querySelector(".live-stream-player_close__c_GRv")?.click();
-        await sleep(0.2);
         document.getElementById("player-"+event.key)?.click();
     }
 });
