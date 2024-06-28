@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     1.0
+// @version     1.01
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -466,5 +466,6 @@ document.addEventListener("keydown", function(event) {
         window.setTimeout(function(){ document.getElementById("chat-input").focus() },99);
     } else if (parseInt(event.key)<7 && parseInt(event.key)>0) {
         document.getElementById("player-"+event.key)?.click();
+	document.activeElement?.blur();
     }
 });
