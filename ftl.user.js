@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     1.02
+// @version     1.05
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -63,18 +63,13 @@ document.arrive(".background_background__fNMDL",{onceOnly:true,existing:true},fu
     document.body.appendChild(removeFilter);
 });
 document.arrive("main",{existing:true},async function(main){
-    main.style.gridTemplateRows = "5% auto 1fr auto";
+    main.style.gridTemplateRows = "5% auto 1fr 3.3% auto";
     main.style.gridTemplateColumns = "11% auto 16.7%";
 
 main.arrive("#main-panel",{onceOnly:true},function(m){
     //m.style.gridRow = "3/4";
-    m.arrive("#live-stream-player",function(v){
-        //handle new player
-        v.parentElement.style.zIndex = 99;
-        //editStyle(v,playerEdits);
-    });
     m.arrive(".livepeer-video-player_controls__y36El",function(v){
-        v.style.inset="20px";
+        //v.style.inset="20px";
     });
     m.arrive(".happening_item__Y7BtW",async function(v){
         //move the big fishtoy popup
@@ -120,19 +115,20 @@ main.arrive(".led-text_led__xdruo > h1",{onceOnly:true},function(h){
     h1 = h;
     smoother();
     (new MutationObserver(smoother)).observe(h1,{characterData:true,attributes:true});
+    document.arrive(".home_left__UiQ0z",{existing:true,once:true},function(left){
+        h.parentElement.parentElement.style.overflow="visible";
+        left.prepend(h.parentElement.parentElement);
+    });
 });
 //poll
-let h2 = null;
-const smoother2 = async function() {
-    h2.style.animationDuration = "7s";
-    h2.style.animationTimingFunction = "steps(420, start)";
-}
 main.arrive(".poll-question_text__PKByz",{onceOnly:false},function(h){
-    h2 = h;
-    smoother2();
-    (new MutationObserver(smoother2)).observe(h2,{characterData:true,attributes:true});
+    h.style.animationDuration = "7s";
+    h.style.animationTimingFunction = "steps(420, start)";
 });
-
+main.arrive(".narrative-poll_narrative-poll__qkl0m",async function(v){
+    await sleep(20);
+    v.style.display = "none";
+});
 //default high quality
 main.arrive(".live-stream-controls_right__u0Dox > label",{onceOnly:true},clickThing);
 });
