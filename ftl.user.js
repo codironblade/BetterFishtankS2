@@ -433,7 +433,7 @@ document.arrive(".footer_shop__HhQQ3",{existing:true},function(v){
         v.remove();
     }
 });
-document.arrive(".livepeer-video-player_bottom-controls__lU5b3 > button[data-muted=true]",function(v){
+document.arrive(".livepeer-video-player_bottom-controls__q9My4 > button[data-muted=true]",function(v){
     //fix muting bug
     window.setTimeout(clickThing,90,v);
 });
@@ -443,7 +443,7 @@ document.addEventListener("keydown", function(event) {
         return;
     }
     if (event.key === "m") {
-        const controls = document.querySelector(".livepeer-video-player_bottom-controls__lU5b3");
+        const controls = document.querySelector(".livepeer-video-player_bottom-controls__q9My4");
         if ((!controls) || (controls.contains(document.activeElement))) {
             return;
         }
