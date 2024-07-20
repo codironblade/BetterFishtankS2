@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     1.1
+// @version     1.15
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -13,6 +13,8 @@
 // @icon        https://www.google.com/s2/favicons?sz=64&domain=fishtank.live
 // @require     https://raw.githubusercontent.com/uzairfarooq/arrive/master/minified/arrive.min.js
 // ==/UserScript==
+
+// PRESS KEYS 1 - 4 TO NAVIGATE CAMS
 
 const sleep = function(s){return new Promise(resolve => setTimeout(resolve, s*1000));};
 const clickThing = function(v) {
@@ -115,10 +117,6 @@ main.arrive(".led-text_led__xdruo > h1",{onceOnly:true},function(h){
     h1 = h;
     smoother();
     (new MutationObserver(smoother)).observe(h1,{characterData:true,attributes:true});
-    document.arrive(".home_left__UiQ0z",{existing:true,once:true},function(left){
-        h.parentElement.parentElement.style.overflow="visible";
-        left.prepend(h.parentElement.parentElement);
-    });
 });
 //poll
 main.arrive(".poll-question_text__PKByz",{onceOnly:false},function(h){
@@ -437,8 +435,13 @@ document.arrive(".livepeer-video-player_volume-controls__q9My4 > button[data-mut
     //fix muting bug
     window.setTimeout(clickThing,90,v);
 });
+document.arrive(".live-streams_edits___1AyV",async function(v){
+    //hide edits announcement
+    await sleep(9);
+    v.style.display = "none";
+});
 //keyboard input
-document.addEventListener("keydown", function(event) {
+document.addEventListener("keydown",async function(event) {
     if (event.isComposing || document.activeElement?.selectionStart !== undefined || document.activeElement?.isContentEditable) {
         return;
     }
@@ -464,7 +467,9 @@ document.addEventListener("keydown", function(event) {
         document.activeElement?.blur();
     } else if (event.keyCode === 191) { // slash
         window.setTimeout(function(){ document.getElementById("chat-input").focus() },99);
-    } else if (parseInt(event.key)<7 && parseInt(event.key)>0) {
-        document.getElementById("list-player-"+event.key)?.click();
+    } else if (parseInt(event.key)<5 && parseInt(event.key)>0) {
+        document.querySelector(".live-stream-player_close__c_GRv")?.click();
+        await sleep(0.2);
+        document.querySelector(".live-streams_live-streams-grid__Tp4ah > button:nth-child("+parseInt(event.key)+")")?.click();
     }
 });
