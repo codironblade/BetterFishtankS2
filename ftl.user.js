@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     1.15
+// @version     1.19
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -123,9 +123,21 @@ main.arrive(".poll-question_text__PKByz",{onceOnly:false},function(h){
     h.style.animationDuration = "7s";
     h.style.animationTimingFunction = "steps(420, start)";
 });
-main.arrive(".narrative-poll_narrative-poll__qkl0m",async function(v){
-    await sleep(20);
-    v.style.display = "none";
+main.arrive(".narrative-poll_hide__vUHD1",{existing:true},function(v){
+    v.parentElement.style.gap = "8px";
+    const btn = document.createElement("button");
+    btn.title="Close";
+    btn.style.height = "18px";
+    btn.style.width = "18px";
+    btn.style.backgroundColor = "transparent";
+    btn.style.cursor = "pointer";
+    btn.style.gridRow = "1/2";
+    btn.style.borderStyle = "none";
+    btn.insertAdjacentHTML("afterbegin",'<svg viewBox="4 3 18 18" fill="currentColor"><path d="M11 9H9V7H7v2h2v2h2v2H9v2H7v2h2v-2h2v-2h2v2h2v2h2v-2h-2v-2h-2v-2h2V9h2V7h-2v2h-2v2h-2V9z" stroke="#FFFFFF" stroke-width="0.2"></path></svg>');
+    v.insertAdjacentElement("afterend",btn);
+    btn.addEventListener("click",function(){
+        v.parentElement.parentElement.style.display = "none";
+    });
 });
 //default high quality
 main.arrive(".live-stream-controls_right__u0Dox > label",{onceOnly:true},clickThing);
@@ -435,11 +447,6 @@ document.arrive(".livepeer-video-player_volume-controls__q9My4 > button[data-mut
     //fix muting bug
     window.setTimeout(clickThing,90,v);
 });
-document.arrive(".live-streams_edits___1AyV",async function(v){
-    //hide edits announcement
-    await sleep(9);
-    v.style.display = "none";
-});
 //keyboard input
 document.addEventListener("keydown",async function(event) {
     if (event.isComposing || document.activeElement?.selectionStart !== undefined || document.activeElement?.isContentEditable) {
@@ -467,7 +474,7 @@ document.addEventListener("keydown",async function(event) {
         document.activeElement?.blur();
     } else if (event.keyCode === 191) { // slash
         window.setTimeout(function(){ document.getElementById("chat-input").focus() },99);
-    } else if (parseInt(event.key)<5 && parseInt(event.key)>0) {
+    } else if (parseInt(event.key)<8 && parseInt(event.key)>0) {
         document.querySelector(".live-stream-player_close__c_GRv")?.click();
         await sleep(0.2);
         document.querySelector(".live-streams_live-streams-grid__Tp4ah > button:nth-child("+parseInt(event.key)+")")?.click();
