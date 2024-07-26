@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     1.19
+// @version     1.20
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -14,7 +14,7 @@
 // @require     https://raw.githubusercontent.com/uzairfarooq/arrive/master/minified/arrive.min.js
 // ==/UserScript==
 
-// PRESS KEYS 1 - 4 TO NAVIGATE CAMS
+// PRESS NUMBER KEYS TO NAVIGATE CAMS
 
 const sleep = function(s){return new Promise(resolve => setTimeout(resolve, s*1000));};
 const clickThing = function(v) {
@@ -443,10 +443,6 @@ document.arrive(".footer_shop__HhQQ3",{existing:true},function(v){
         v.remove();
     }
 });
-document.arrive(".livepeer-video-player_volume-controls__q9My4 > button[data-muted=true]",function(v){
-    //fix muting bug
-    window.setTimeout(clickThing,90,v);
-});
 //keyboard input
 document.addEventListener("keydown",async function(event) {
     if (event.isComposing || document.activeElement?.selectionStart !== undefined || document.activeElement?.isContentEditable) {
@@ -474,9 +470,9 @@ document.addEventListener("keydown",async function(event) {
         document.activeElement?.blur();
     } else if (event.keyCode === 191) { // slash
         window.setTimeout(function(){ document.getElementById("chat-input").focus() },99);
-    } else if (parseInt(event.key)<8 && parseInt(event.key)>0) {
+    } else if (parseInt(event.key)<9 && parseInt(event.key)>0) {
         document.querySelector(".live-stream-player_close__c_GRv")?.click();
         await sleep(0.2);
-        document.querySelector(".live-streams_live-streams-grid__Tp4ah > button:nth-child("+parseInt(event.key)+")")?.click();
+        document.querySelectorAll(".live-stream_live-stream__uVezO")[parseInt(event.key)-1]?.click();
     }
 });
