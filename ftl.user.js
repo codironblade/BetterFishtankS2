@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     1.25
+// @version     1.27
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -21,7 +21,7 @@ const clickThing = function(v) {
     v.click();
     document.activeElement?.blur();
 }
-const settings = {CHtts:false,CHsfx:false,CHemote:false,CHhappening:false,CHsystem:false,CHclan:false,CHdefault:false,bgbr:40,bg:"Blue",volume:40,muteNukes:true};
+const settings = {CHtts:false,CHsfx:false,CHemote:false,CHhappening:false,CHsystem:false,CHclan:false,CHdefault:false,bgbr:40,bg:"Blue",volume:75,muteNukes:true};
 const settingsInfo = [["CHtts","Chat hide TTS"],["CHsfx","Chat hide SFX"],["CHemote","Chat hide emotes/commands"],["CHhappening","Chat hide items"],["CHsystem","Chat hide system"],["CHclan","Chat hide clan stuff"],
                       ["CHdefault","Chat hide chats"],["bgbr","Background Brightness"],["bg","Background Image","Blue","Dark","S2 Green","Default"],["volume","Volume of UI sounds"],["muteNukes","Specifically mute nuke sfx"]];
 const savedStr = GM_getValue("ftlsave");
@@ -159,10 +159,10 @@ let tempMute = false;
 HTMLAudioElement.prototype.play = function () {
     if (tempMute || this.src.substring(33,39)==="popup-" || (this.src.substring(33,38)==="nuke-" && settings.muteNukes)) {
         this.volume = 0;
-    } else if (this.src.substring(33) === "fishtoy.wav" && settings.volume > 20) {
+    } else if (this.src.substring(33) === "fishtoy.wav" && settings.volume > 30) {
         this.volume = this.volume / 3;
     } else {
-        this.volume = settings.volume/100;
+        this.volume = this.voluume * (settings.volume/100);
     }
     return oldPlay.apply(this);
 }
