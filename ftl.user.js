@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     1.20
+// @version     1.25
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -21,9 +21,9 @@ const clickThing = function(v) {
     v.click();
     document.activeElement?.blur();
 }
-const settings = {CHtts:false,CHsfx:false,CHemote:false,CHhappening:false,CHsystem:false,CHclan:false,CHdefault:false,bgbr:40,bg:"Blue",muteAll:false};
+const settings = {CHtts:false,CHsfx:false,CHemote:false,CHhappening:false,CHsystem:false,CHclan:false,CHdefault:false,bgbr:40,bg:"Blue",volume:40,muteNukes:true};
 const settingsInfo = [["CHtts","Chat hide TTS"],["CHsfx","Chat hide SFX"],["CHemote","Chat hide emotes/commands"],["CHhappening","Chat hide items"],["CHsystem","Chat hide system"],["CHclan","Chat hide clan stuff"],
-                      ["CHdefault","Chat hide chats"],["bgbr","Background Brightness"],["bg","Background Image","Blue","Dark","S2 Green","Default"],["muteAll","Mute all UI sounds"]];
+                      ["CHdefault","Chat hide chats"],["bgbr","Background Brightness"],["bg","Background Image","Blue","Dark","S2 Green","Default"],["volume","Volume of UI sounds"],["muteNukes","Specifically mute nuke sfx"]];
 const savedStr = GM_getValue("ftlsave");
 //console.log("savedStr:",savedStr);
 for (const [k,v] of Object.entries( savedStr ? JSON.parse(savedStr) : {} )) {
@@ -91,15 +91,13 @@ main.arrive(".poll_footer__rALdX",{onceOnly:true},function(v){
 main.arrive(".top-bar-user_top-bar-user__VUdJm",{onceOnly:true},function(v){
     v.style.zIndex=4;
 });
-main.arrive(".health_health___IPyk",{onceOnly:true},function(v){
     document.arrive(".status-bar_xp__VzguC",{onceOnly:true,existing:true},function(xp){
         xp.style.width = "130px";
         xp.arrive(".experience-bar_bar__HcNkR",{onceOnly:true,existing:true},function(v2){
             v2.style.height="100%";
         });
-        v.parentElement.appendChild(xp);
+        xp.parentElement.parentElement.prepend(xp);
     });
-});
 //hide season pass
 document.arrive(".toast_season-pass__cmkhU",function(v){
     v.arrive(".toast_close__iwAGl > button",{onceOnly:true,existing:true},clickThing);
@@ -143,13 +141,6 @@ main.arrive(".narrative-poll_hide__vUHD1",{existing:true},function(v){
 main.arrive(".live-stream-controls_right__u0Dox > label",{onceOnly:true},clickThing);
 });
 
-//no popup for toggling auto cams
-document.arrive(".toast_message__l35K3 > h3",function(v){
-    if (v.textContent.substring(0,9) === "Auto mode") {
-        v.parentElement.parentElement.arrive("button",{onceOnly:true,existing:true},clickThing);
-    }
-})
-
 //chat stuff
 document.arrive("#chat-messages > div",async function(v){
     v.parentElement.parentElement.style.padding = "0px";
@@ -166,10 +157,12 @@ document.arrive("#chat-messages > div",async function(v){
 const oldPlay = HTMLAudioElement.prototype.play;
 let tempMute = false;
 HTMLAudioElement.prototype.play = function () {
-    if (settings.muteAll || tempMute || this.src.substring(33,39)==="popup-") {
+    if (tempMute || this.src.substring(33,39)==="popup-" || (this.src.substring(33,38)==="nuke-" && settings.muteNukes)) {
         this.volume = 0;
-    } else if (this.src.substring(33) === "fishtoy.wav") {
+    } else if (this.src.substring(33) === "fishtoy.wav" && settings.volume > 20) {
         this.volume = this.volume / 3;
+    } else {
+        this.volume = settings.volume/100;
     }
     return oldPlay.apply(this);
 }
@@ -326,6 +319,13 @@ document.arrive(".faction-troll_pop-up__i5p89",async function(v){
     await sleep(0.2);
     tempMute=false;
 });
+document.arrive(".fake-pop-ups_pop-up__8PiOJ",async function(v){
+    console.log("popup clicked");
+    tempMute=true;
+    v.click();
+    await sleep(0.2);
+    tempMute=false;
+});
 //S2 ARCHIVE
 const archiveState = {r:'',d:'',h:'',v:null};
 const onLoadingArchive = async function(){
@@ -350,7 +350,9 @@ const onLoadingArchive = async function(){
                     anyRed = true
                 }
                 if (btn1) {
-                    btn1.click();
+                    await sleep(0.2);
+                    //this breaking the buttons somehow
+                    //btn1.click();
                     await sleep(0.2);
                 }
             }
@@ -437,11 +439,21 @@ document.arrive(".s2_body__Zco_w",{existing:true},function(s2body){
         }
         lbl.parentElement.append(clone);
     });
-});
-document.arrive(".footer_shop__HhQQ3",{existing:true},function(v){
-    if (document.location.href.indexOf("archive") > -1) {
-        v.remove();
+    if (XMLHttpRequest.modified) { return; };
+    XMLHttpRequest.modified = true;
+    const oldfetch = XMLHttpRequest.prototype.send;
+    XMLHttpRequest.prototype.send = function(data){
+        if (typeof(data)==="string" && data.indexOf('"hour":0')>-1) {
+            const j = JSON.parse(data);
+            j.day = j.day - 1;
+            j.hour = 24;
+            data = JSON.stringify(j);
+        }
+        return oldfetch.apply(this, arguments);
     }
+});
+document.arrive(".ads_ads__Z1cPk",{existing:true,onceOnly:true},function(v){
+    v.style.display = "none";
 });
 //keyboard input
 document.addEventListener("keydown",async function(event) {
@@ -470,9 +482,7 @@ document.addEventListener("keydown",async function(event) {
         document.activeElement?.blur();
     } else if (event.keyCode === 191) { // slash
         window.setTimeout(function(){ document.getElementById("chat-input").focus() },99);
-    } else if (parseInt(event.key)<9 && parseInt(event.key)>0) {
-        document.querySelector(".live-stream-player_close__c_GRv")?.click();
-        await sleep(0.2);
-        document.querySelectorAll(".live-stream_live-stream__uVezO")[parseInt(event.key)-1]?.click();
+    } else if (parseInt(event.key)<10 && parseInt(event.key)>0) {
+        document.querySelectorAll(".live-streams-monitoring-point_item__STDCt")[parseInt(event.key)-1]?.click();
     }
 });
