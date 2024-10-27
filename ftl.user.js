@@ -162,7 +162,7 @@ HTMLAudioElement.prototype.play = function () {
     } else if (this.src.substring(33) === "fishtoy.wav" && settings.volume > 30) {
         this.volume = this.volume / 3;
     } else {
-        this.volume = this.voluume * (settings.volume/100);
+        this.volume = this.volume * (settings.volume/100);
     }
     return oldPlay.apply(this);
 }
