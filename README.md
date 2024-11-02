@@ -5,9 +5,9 @@ A small userscript that improves your fishtank experience. Target site: https://
 (Requires tampermonkey / violentmonkey / greasemonkey)
 
 ## Features
-- keybinds for: mute [M], autocam [, or .], chat [/], fullscreen [F], and cams [1-6]
+- keybinds for: mute [M], autocam [, or .], chat [/], fullscreen [F], and cams [0-9]
 - No indian troll popups
-- PAID ARCHIVE: remembers date and seek-position allowing to switch rooms like it were live. also better UI
+- PAID ARCHIVE: better UI and enables selecting hour 1
 - bigger player
 - smaller margin elements
 - alt background
@@ -19,7 +19,8 @@ A small userscript that improves your fishtank experience. Target site: https://
 - no popup for season pass
 - better "last tts"
 - hide garbage from chat
-- download button on clips
+- hide narrative polls
+- auto accept global missions
 
 Settings can be found here:
 
