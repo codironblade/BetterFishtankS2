@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     1.27
+// @version     1.29
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -21,9 +21,10 @@ const clickThing = function(v) {
     v.click();
     document.activeElement?.blur();
 }
-const settings = {CHtts:false,CHsfx:false,CHemote:false,CHhappening:false,CHsystem:false,CHclan:false,CHdefault:false,bgbr:40,bg:"Blue",volume:75,muteNukes:true};
+const settings = {CHtts:false,CHsfx:false,CHemote:false,CHhappening:false,CHsystem:false,CHclan:false,CHdefault:false,bgbr:40,bg:"Blue",volume:75,muteNukes:true,acceptMissions:false};
 const settingsInfo = [["CHtts","Chat hide TTS"],["CHsfx","Chat hide SFX"],["CHemote","Chat hide emotes/commands"],["CHhappening","Chat hide items"],["CHsystem","Chat hide system"],["CHclan","Chat hide clan stuff"],
-                      ["CHdefault","Chat hide chats"],["bgbr","Background Brightness"],["bg","Background Image","Blue","Dark","S2 Green","Default"],["volume","Volume of UI sounds"],["muteNukes","Specifically mute nuke sfx"]];
+                      ["CHdefault","Chat hide chats"],["bgbr","Background Brightness"],["bg","Background Image","Blue","Dark","S2 Green","Default"],["volume","Volume of UI sounds"],["muteNukes","Specifically mute nuke sfx"],
+                     ["acceptMissions","Auto accept missions"]];
 const savedStr = GM_getValue("ftlsave");
 //console.log("savedStr:",savedStr);
 for (const [k,v] of Object.entries( savedStr ? JSON.parse(savedStr) : {} )) {
@@ -139,8 +140,20 @@ main.arrive(".narrative-poll_hide__vUHD1",{existing:true},function(v){
 });
 //default high quality
 main.arrive(".live-stream-controls_right__u0Dox > label",{onceOnly:true},clickThing);
+//ad block
+main.arrive(".ads_ads__Z1cPk",{existing:true},function(v){
+    v.style.display = "none";
+});
 });
 
+let currentCam = "";
+let lastCam = "";
+document.arrive(".live-stream-player_name__nhgrA",function(v){
+    if (v.textContent !== currentCam) {
+        lastCam = currentCam;
+        currentCam = v.textContent;
+    }
+});
 //chat stuff
 document.arrive("#chat-messages > div",async function(v){
     v.parentElement.parentElement.style.padding = "0px";
@@ -150,8 +163,31 @@ document.arrive("#chat-messages > div",async function(v){
                 v.style.display = "none";
                 //v.style.backgroundColor = "red";
             }
+            if (set !== "CHtts") {
+                return;
+            }
+            const roomText = v.querySelector(".chat-message-tts_room__1lmqo").textContent.toLowerCase();
+            const history = document.querySelector(".tts-history_tts-history__8_9eB");
+            const roomElement = history.querySelector(".tts-history_room__QNUZ0");
+            if (roomElement) {
+                roomElement.textContent = roomText;
+            }
+            for (let i=0; i<5; i++) {
+                const curcam = document.querySelector(".live-stream-player_name__nhgrA")?.textContent.toLowerCase();
+                if (curcam !== roomText) {
+                    history.style.backgroundColor = "#740700";
+                }
+                await sleep(0.5);
+                history.style.backgroundColor = null;
+                await sleep(0.5);
+            }
         }
     }
+});
+document.arrive(".chat-message-default_watching__TBGGz",function(v){
+    v.nextSibling.textContent = "";
+    v.childNodes[1].textContent="";
+    v.style.color="gray";
 });
 //edits sounds
 const oldPlay = HTMLAudioElement.prototype.play;
@@ -320,7 +356,6 @@ document.arrive(".faction-troll_pop-up__i5p89",async function(v){
     tempMute=false;
 });
 document.arrive(".fake-pop-ups_pop-up__8PiOJ",async function(v){
-    console.log("popup clicked");
     tempMute=true;
     v.click();
     await sleep(0.2);
@@ -329,39 +364,7 @@ document.arrive(".fake-pop-ups_pop-up__8PiOJ",async function(v){
 //S2 ARCHIVE
 const archiveState = {r:'',d:'',h:'',v:null};
 const onLoadingArchive = async function(){
-    archiveState.init = false;
-    await sleep(0.06);
-    const selectLabels = document.querySelectorAll(".select_current__qZY2v");
-    selectLabels.forEach(function(e){ e.style.color=null; });
-    const newState = {r:selectLabels[0].textContent,d:selectLabels[1].textContent,h:selectLabels[2].textContent};
-    if (newState.r !== archiveState.r) {
-        if (newState.d.length === 0) {
-            archiveState.doseek = true;
-            let anyRed = false;
-            tempMute = true;
-            for (let i=1; i<3; i++) {
-                const stateKey = (i===1 ? "d" : "h")
-                const label = selectLabels[i];
-                const btn1 = Array.from(label.parentElement.nextElementSibling.children).find(btn => btn.firstElementChild.textContent === archiveState[stateKey]);
-                label.textContent = archiveState[stateKey];
-                newState[stateKey] = archiveState[stateKey];
-                if (anyRed || !btn1) {
-                    label.style.color = "red";
-                    anyRed = true
-                }
-                if (btn1) {
-                    await sleep(0.2);
-                    //this breaking the buttons somehow
-                    //btn1.click();
-                    await sleep(0.2);
-                }
-            }
-            tempMute=false;
-        }
-    } else {
-        archiveState.doseek = false;
-    }
-    archiveState.r = newState.r; archiveState.d = newState.d; archiveState.h = newState.h;
+    //deleted bc it got bugged
 };
 document.arrive(".s2_body__Zco_w",{existing:true},function(s2body){
     s2body.style.width = "1300px";
@@ -452,8 +455,22 @@ document.arrive(".s2_body__Zco_w",{existing:true},function(s2body){
         return oldfetch.apply(this, arguments);
     }
 });
-document.arrive(".ads_ads__Z1cPk",{existing:true,onceOnly:true},function(v){
-    v.style.display = "none";
+//accept global missions
+document.arrive(".global-mission-modal_accept__fjegf > button",async function(v){
+    if (settings.acceptMissions) {
+        await sleep(0.4);
+        v.click();
+    }
+});
+document.arrive(".live-streams-monitoring-point_name__6nqOh > span",function(v){
+    const newn = Number(v.textContent) - 2;
+    if (newn < 0) {
+        v.textContent = ",.";
+    } else if (newn < 10) {
+        v.textContent = "0"+newn;
+    } else {
+        v.textContent = newn;
+    }
 });
 //keyboard input
 document.addEventListener("keydown",async function(event) {
@@ -477,12 +494,17 @@ document.addEventListener("keydown",async function(event) {
             document.querySelector("video")?.requestFullscreen();
         }
     } else if (event.key === "," || event.key == ".") {
-        const dir = document.querySelector(".status-bar_director__YrTCo").textContent==="DirectorModeEnabled";
-	document.querySelector(dir ? ".live-stream-player_close__c_GRv" : ".status-bar_director__YrTCo")?.click();
+        if (currentCam === "Director Mode") {
+            if (lastCam) {
+                document.getElementById("list-"+lastCam.toLowerCase().replace(" ","-")+"-3")?.click();
+            }
+        } else {
+            document.getElementById("list-director-mode-3")?.click();
+        }
         document.activeElement?.blur();
     } else if (event.keyCode === 191) { // slash
         window.setTimeout(function(){ document.getElementById("chat-input").focus() },99);
-    } else if (parseInt(event.key)<10 && parseInt(event.key)>0) {
-        document.querySelectorAll(".live-streams-monitoring-point_item__STDCt")[parseInt(event.key)-1]?.click();
+    } else if (parseInt(event.key)<10 && parseInt(event.key)>-1) {
+        document.querySelectorAll(".live-streams-monitoring-point_item__STDCt")[parseInt(event.key)+1]?.click();
     }
 });
