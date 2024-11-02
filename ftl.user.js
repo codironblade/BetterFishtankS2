@@ -72,6 +72,7 @@ document.arrive("main",{existing:true},async function(main){
 main.arrive("#main-panel",{onceOnly:true},function(m){
     //m.style.gridRow = "3/4";
     m.arrive(".livepeer-video-player_controls__y36El",function(v){
+	    v.style.zIndex = 5;
         //v.style.inset="20px";
     });
     m.arrive(".happening_item__Y7BtW",async function(v){
