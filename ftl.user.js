@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     1.29
+// @version     1.35
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -72,7 +72,7 @@ document.arrive("main",{existing:true},async function(main){
 main.arrive("#main-panel",{onceOnly:true},function(m){
     //m.style.gridRow = "3/4";
     m.arrive(".livepeer-video-player_controls__y36El",function(v){
-	    v.style.zIndex = 5;
+        v.style.zIndex = 5;
         //v.style.inset="20px";
     });
     m.arrive(".happening_item__Y7BtW",async function(v){
@@ -85,6 +85,32 @@ main.arrive("#main-panel",{onceOnly:true},function(m){
         document.getElementById("chat-messages")?.parentElement.appendChild(clone);
         await sleep(6);
         clone.remove();
+    });
+    //ui visiblity
+    let uiHidden = false;
+    m.arrive(".live-stream-player_navigation__VqS_z",function(v){
+        const btn = document.createElement("button");
+        btn.title="HideUI";
+        btn.style.height = "18px";
+        btn.style.width = "18px";
+        btn.style.backgroundColor = "transparent";
+        btn.insertAdjacentHTML("afterbegin",'<svg viewBox="0 0 48 48" height=24 width=24 fill="none"><path d="M24 9c-10 0-18.54 6.22-22 15 3.46 8.78 12 15 22 15 10.01 0 18.54-6.22 22-15-3.46-8.78-11.99-15-22-15zm0 25c-5.52 0-10-4.48-10-10s4.48-10 10-10 10 4.48 10 10-4.48 10-10 10zm0-16c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z" stroke="#aaa" stroke-width="3"></path></svg>');
+        btn.addEventListener("click",function(){
+            uiHidden = !uiHidden;
+            document.querySelectorAll("#livepeer-video-player > div > div").forEach(function(ui){
+                if (uiHidden) {
+                    ui.style.display = "none";
+                } else {
+                    ui.style.display = "";
+                }
+            });
+        });
+        v.prepend(btn);
+    });
+    m.arrive("#livepeer-video-player > div > div",function(ui){
+        if (uiHidden) {
+            ui.style.display = "none";
+        }
     });
 });
 main.arrive(".poll_footer__rALdX",{onceOnly:true},function(v){
@@ -158,6 +184,9 @@ document.arrive(".live-stream-player_name__nhgrA",function(v){
 //chat stuff
 document.arrive("#chat-messages > div",async function(v){
     v.parentElement.parentElement.style.padding = "0px";
+    if (v.className.indexOf("chat-message-default")>-1 && v.textContent.toLowerCase().indexOf("/redeem")>-1) {
+        v.style.display = "none";
+    }
     for (const[set,value] of Object.entries(settings)) {
         if (set.substring(0,2)=="CH" && (v.className.substring(0,set.length+11) === "chat-message-"+set.substring(2))) {
             if (value===true) {
@@ -336,19 +365,6 @@ document.arrive(".settings-modal_password___da3r",function(tocloned){
     ourBtn.textContent = "SCRIPT";
     ourBtn.addEventListener("click",onSetBtnClick);
 })
-//download button for clips
-document.arrive(".clip-player_date__Xk3xl",{existing:true},function(v){
-    const btn = document.createElement("button");
-    btn.title="Download";
-    btn.style.height = "24px";
-    btn.style.width = "24px";
-    btn.style.backgroundColor = "transparent";
-    btn.insertAdjacentHTML("afterbegin",'<svg viewBox="0 2 24 24" fill="none"><path d="M12 16L12 8M9 13L11.913 15.913V15.913C11.961 15.961 12.039 15.961 12.087 15.913V15.913L15 13M3 15L3 16L3 19C3 20.1046 3.89543 21 5 21L19 21C20.1046 21 21 20.1046 21 19L21 16L21 15" stroke="#FFFFFF" stroke-width="1.5"></path></svg>');
-    v.parentElement.parentElement.appendChild(btn);
-    btn.addEventListener("click",function(){
-        window.open(document.querySelector('video').src);
-    });
-});
 //hide popups
 document.arrive(".faction-troll_pop-up__i5p89",async function(v){
     tempMute=true;
