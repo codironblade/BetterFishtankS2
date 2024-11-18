@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     1.35
+// @version     1.37
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -87,30 +87,21 @@ main.arrive("#main-panel",{onceOnly:true},function(m){
         clone.remove();
     });
     //ui visiblity
-    let uiHidden = false;
-    m.arrive(".live-stream-player_navigation__VqS_z",function(v){
-        const btn = document.createElement("button");
-        btn.title="HideUI";
-        btn.style.height = "18px";
-        btn.style.width = "18px";
-        btn.style.backgroundColor = "transparent";
-        btn.insertAdjacentHTML("afterbegin",'<svg viewBox="0 0 48 48" height=24 width=24 fill="none"><path d="M24 9c-10 0-18.54 6.22-22 15 3.46 8.78 12 15 22 15 10.01 0 18.54-6.22 22-15-3.46-8.78-11.99-15-22-15zm0 25c-5.52 0-10-4.48-10-10s4.48-10 10-10 10 4.48 10 10-4.48 10-10 10zm0-16c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z" stroke="#aaa" stroke-width="3"></path></svg>');
-        btn.addEventListener("click",function(){
-            uiHidden = !uiHidden;
+    m.arrive("#livepeer-video-player > div > div",function(ui){
+        ui.style.display = "none";
+    });
+    m.arrive(".live-stream-player_container__A4sNR",function(v){
+        v.addEventListener("pointerout",function(){
             document.querySelectorAll("#livepeer-video-player > div > div").forEach(function(ui){
-                if (uiHidden) {
-                    ui.style.display = "none";
-                } else {
-                    ui.style.display = "";
-                }
+                ui.style.display = "none";
             });
         });
-        v.prepend(btn);
-    });
-    m.arrive("#livepeer-video-player > div > div",function(ui){
-        if (uiHidden) {
-            ui.style.display = "none";
-        }
+        v.addEventListener("pointerover",function(){
+            document.querySelectorAll("#livepeer-video-player > div > div").forEach(function(ui){
+                ui.style.display = "";
+            });
+        });
+
     });
 });
 main.arrive(".poll_footer__rALdX",{onceOnly:true},function(v){
