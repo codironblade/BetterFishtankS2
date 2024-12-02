@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     1.37
+// @version     1.38
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -87,17 +87,17 @@ main.arrive("#main-panel",{onceOnly:true},function(m){
         clone.remove();
     });
     //ui visiblity
-    m.arrive("#livepeer-video-player > div > div",function(ui){
+    m.arrive(".hls-stream-player_hls-stream-player__BJiGl > div",function(ui){
         ui.style.display = "none";
     });
     m.arrive(".live-stream-player_container__A4sNR",function(v){
         v.addEventListener("pointerout",function(){
-            document.querySelectorAll("#livepeer-video-player > div > div").forEach(function(ui){
+            document.querySelectorAll(".hls-stream-player_hls-stream-player__BJiGl > div").forEach(function(ui){
                 ui.style.display = "none";
             });
         });
         v.addEventListener("pointerover",function(){
-            document.querySelectorAll("#livepeer-video-player > div > div").forEach(function(ui){
+            document.querySelectorAll(".hls-stream-player_hls-stream-player__BJiGl > div").forEach(function(ui){
                 ui.style.display = "";
             });
         });
@@ -486,15 +486,11 @@ document.addEventListener("keydown",async function(event) {
         return;
     }
     if (event.key === "m") {
-        const controls = document.querySelector(".livepeer-video-player_volume-controls__q9My4");
+        const controls = document.querySelector(".hls-stream-player_mute__BZFxC");
         if ((!controls) || (controls.contains(document.activeElement))) {
             return;
         }
-        if (controls.children.length < 3) {
-            controls.querySelector("button")?.click();
-        } else {
-            controls.querySelector("button:nth-child(2)")?.click();
-        }
+        controls.click();
     } else if (event.key === "f") {
         if (document.fullscreen) {
             document.exitFullscreen()
