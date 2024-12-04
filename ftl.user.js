@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     1.38
+// @version     1.39
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -103,6 +103,12 @@ main.arrive("#main-panel",{onceOnly:true},function(m){
         });
 
     });
+    //default high quality
+    m.arrive(".hls-stream-player_quality__RdZRA .select_option__lVOGV",function(v){
+        if (v.textContent==="1080p" && !v.classList.contains("select_active__2Grrj")) {
+            v.click();
+        }
+    });
 });
 main.arrive(".poll_footer__rALdX",{onceOnly:true},function(v){
     v.style.display="block";
@@ -156,8 +162,6 @@ main.arrive(".narrative-poll_hide__vUHD1",{existing:true},function(v){
         v.parentElement.parentElement.style.display = "none";
     });
 });
-//default high quality
-main.arrive(".live-stream-controls_right__u0Dox > label",{onceOnly:true},clickThing);
 //ad block
 main.arrive(".ads_ads__Z1cPk",{existing:true},function(v){
     v.style.display = "none";
