@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     1.39
+// @version     1.40
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -69,7 +69,7 @@ document.arrive("main",{existing:true},async function(main){
     main.style.gridTemplateRows = "5.5% auto 1fr 4% auto";
     main.style.gridTemplateColumns = "11% auto 16.7%";
 
-main.arrive("#main-panel",{onceOnly:true},function(m){
+main.arrive("#main-panel",{onceOnly:true,existing:true},function(m){
     //m.style.gridRow = "3/4";
     m.arrive(".livepeer-video-player_controls__y36El",function(v){
         v.style.zIndex = 5;
@@ -136,7 +136,7 @@ const smoother = function() {
     h1.parentElement.style.height = "17px";
     h1.style.fontSize = "17px";
 }
-main.arrive(".led-text_led__xdruo > h1",{onceOnly:true},function(h){
+main.arrive(".led-text_led__xdruo > h1",{onceOnly:true,existing:false},function(h){
     h1 = h;
     smoother();
     (new MutationObserver(smoother)).observe(h1,{characterData:true,attributes:true});
@@ -170,10 +170,11 @@ main.arrive(".ads_ads__Z1cPk",{existing:true},function(v){
 
 let currentCam = "";
 let lastCam = "";
-document.arrive(".live-stream-player_name__nhgrA",function(v){
-    if (v.textContent !== currentCam) {
+document.arrive(".live-stream-player_container__A4sNR ",function(v){
+    const vcam = v.id.substring(19);
+    if (vcam !== currentCam) {
         lastCam = currentCam;
-        currentCam = v.textContent;
+        currentCam = vcam;
     }
 });
 //chat stuff
@@ -489,30 +490,36 @@ document.addEventListener("keydown",async function(event) {
     if (event.isComposing || document.activeElement?.selectionStart !== undefined || document.activeElement?.isContentEditable) {
         return;
     }
-    if (event.key === "m") {
-        const controls = document.querySelector(".hls-stream-player_mute__BZFxC");
-        if ((!controls) || (controls.contains(document.activeElement))) {
+    let key = event.key.toLowerCase();
+    if (key === "m") {
+        const controls = document.querySelector(".live-stream-controls_mute__rHUC1");
+        if ((!controls) || (controls.parentElement.contains(document.activeElement))) {
             return;
         }
         controls.click();
-    } else if (event.key === "f") {
+    } else if (key === "f") {
         if (document.fullscreen) {
             document.exitFullscreen()
         } else {
             document.querySelector("video")?.requestFullscreen();
         }
-    } else if (event.key === "," || event.key == ".") {
-        if (currentCam === "Director Mode") {
+    } else if (key === "," || key == ".") {
+        document.querySelector(".live-stream-player_close__c_GRv")?.click();
+        await sleep(0.1);
+        if (currentCam === "camera-13-4") {
             if (lastCam) {
-                document.getElementById("list-"+lastCam.toLowerCase().replace(" ","-")+"-3")?.click();
+                document.getElementById(lastCam)?.click();
             }
         } else {
-            document.getElementById("list-director-mode-3")?.click();
+            document.getElementById("camera-13-4")?.click();
         }
         document.activeElement?.blur();
     } else if (event.keyCode === 191) { // slash
         window.setTimeout(function(){ document.getElementById("chat-input").focus() },99);
-    } else if (parseInt(event.key)<10 && parseInt(event.key)>-1) {
-        document.querySelectorAll(".live-streams-monitoring-point_item__STDCt")[parseInt(event.key)+1]?.click();
+    } else if (parseInt(key)<10 && parseInt(key)>-1) {
+        if (key == "0") { key="12" };
+        document.querySelector(".live-stream-player_close__c_GRv")?.click();
+        await sleep(0.1)
+        document.getElementById("camera-"+ key +"-4")?.click();
     }
 });
