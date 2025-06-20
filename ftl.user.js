@@ -4,7 +4,7 @@
 // @match       *://*.fishtank.live/*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @version     1.40
+// @version     1.41
 // @author      codironblade
 // @homepageURL https://github.com/codironblade/BetterFishtankS2
 // @updateURL    https://raw.githubusercontent.com/codironblade/BetterFishtankS2/main/ftl.user.js
@@ -88,17 +88,23 @@ main.arrive("#main-panel",{onceOnly:true,existing:true},function(m){
     });
     //ui visiblity
     m.arrive(".hls-stream-player_hls-stream-player__BJiGl > div",function(ui){
-        ui.style.display = "none";
+        if (ui.className.substring(0,4)==="live") {
+            ui.style.display = "none";
+        }
     });
     m.arrive(".live-stream-player_container__A4sNR",function(v){
         v.addEventListener("pointerout",function(){
-            document.querySelectorAll(".hls-stream-player_hls-stream-player__BJiGl > div").forEach(function(ui){
-                ui.style.display = "none";
+            document.querySelectorAll(".live-stream-player_container__A4sNR > div").forEach(function(ui){
+                if (ui.className.substring(0,4)==="live") {
+                    ui.style.display = "none";
+                }
             });
         });
         v.addEventListener("pointerover",function(){
-            document.querySelectorAll(".hls-stream-player_hls-stream-player__BJiGl > div").forEach(function(ui){
-                ui.style.display = "";
+            document.querySelectorAll(".live-stream-player_container__A4sNR > div").forEach(function(ui){
+                if (ui.className.substring(0,4)==="live") {
+                    ui.style.display = "";
+                }
             });
         });
 
@@ -475,16 +481,11 @@ document.arrive(".global-mission-modal_accept__fjegf > button",async function(v)
         v.click();
     }
 });
-document.arrive(".live-streams-monitoring-point_name__6nqOh > span",function(v){
-    const newn = Number(v.textContent) - 2;
-    if (newn < 0) {
-        v.textContent = ",.";
-    } else if (newn < 10) {
-        v.textContent = "0"+newn;
-    } else {
-        v.textContent = newn;
-    }
+document.arrive(".announcement-bar_close__Y38aM",async function(v){
+    await sleep(20);
+    v.click();
 });
+
 //keyboard input
 document.addEventListener("keydown",async function(event) {
     if (event.isComposing || document.activeElement?.selectionStart !== undefined || document.activeElement?.isContentEditable) {
